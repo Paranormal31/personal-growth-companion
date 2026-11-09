@@ -618,23 +618,6 @@ export function CelestialCharacter({
               strokeLinejoin="round"
               fill="none"
             />
-
-            {/* Cozy Little Star Companion floating beside the moon */}
-            <motion.path
-              d="M 88 40 L 90 44 L 94 45 L 90.5 48 L 92 52 L 88 49 L 84 52 L 85.5 48 L 82 45 L 86 44 Z"
-              fill="#FFE699"
-              animate={{
-                scale: [0.85, 1.18, 0.85],
-                opacity: [0.65, 1, 0.65],
-                rotate: [-6, 6, -6],
-              }}
-              transition={{
-                duration: 2.6,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-              style={{ transformOrigin: '88px 46px' }}
-            />
           </motion.g>
         )}
       </motion.svg>

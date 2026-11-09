@@ -13,21 +13,21 @@ import { TopNav } from './components/TopNav';
 import { MoodLabel } from './components/MoodLabel';
 import { MainAppPlaceholder } from './components/MainAppPlaceholder';
 import { DesktopTimeDock } from './components/dev/DesktopTimeDock';
+import { CelestialSceneryViewer } from './components/scenery/CelestialSceneryViewer';
 import { useTimeOfDay } from './hooks/useTimeOfDay';
+import { Sparkles, Smile, SunMedium } from 'lucide-react';
 
 /**
  * App — Personal Growth Companion
  *
  * Implements:
+ * - Default View: CelestialSceneryViewer — pure custom vector 4-phase scenery & orbital animation
  * - Phase 1: Minimalist Mood Meter UI (character face, mood text, 4-step magnetic slider)
  * - Stage 2: Fabulous-inspired Dashboard with Living Scenic Landscape & Daily Rituals
- * - Seamless view transitions via Framer Motion AnimatePresence
- * - Living time-of-day synchronization & interactive orbital simulation controls
- * - Floating DesktopTimeDock positioned outside the phone mockup on desktop viewports
- * - 100dvh edge-to-edge on mobile, centered framed mockup with soft ambient glow on desktop
  */
 export function App() {
-  const [isMoodMeterOpen, setIsMoodMeterOpen] = useState(false);
+  // 'celestial' is default primary view showcasing pure vector 4-phase CelestialSceneryViewer
+  const [viewMode, setViewMode] = useState<'celestial' | 'mood' | 'dashboard'>('celestial');
   const [currentPhase, setCurrentPhase] = useState<MoodPhase>('not_bad');
   const [continuousValue, setContinuousValue] = useState<number | undefined>(undefined);
 
@@ -59,19 +59,60 @@ export function App() {
       ? interpolateInkColor(continuousValue)
       : activeTheme.inkColor;
 
+  // Primary Default View: CelestialSceneryViewer
+  if (viewMode === 'celestial') {
+    return (
+      <div className="relative w-full h-[100dvh]">
+        <CelestialSceneryViewer />
+
+        {/* Floating Quick View Mode Switcher */}
+        <div className="fixed top-4 left-4 z-50 flex items-center gap-2 bg-black/60 backdrop-blur-xl border border-white/15 p-1.5 rounded-full shadow-2xl">
+          <button
+            type="button"
+            onClick={() => setViewMode('celestial')}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+              viewMode === 'celestial'
+                ? 'bg-amber-500 text-white shadow-md'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            <SunMedium size={14} />
+            Celestial Animation
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('mood')}
+            className="px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 text-white/60 hover:text-white transition cursor-pointer"
+          >
+            <Smile size={14} />
+            Mood UI
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('dashboard')}
+            className="px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 text-white/60 hover:text-white transition cursor-pointer"
+          >
+            <Sparkles size={14} />
+            Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Desktop ambient backdrop & phone canvas background mapping
   const isNight = currentTime === 'night';
   const activeDashboardBg = isNight
     ? '#13112A'
     : timeTheme.colors.surface || timeTheme.colors.background || '#FAF7F2';
 
-  const viewportBgColor = isMoodMeterOpen
+  const viewportBgColor = viewMode === 'mood'
     ? activeBgColor
     : isNight
       ? '#0B0A1B'
       : timeTheme.colors.background;
 
-  const phoneFrameBgColor = isMoodMeterOpen ? activeBgColor : activeDashboardBg;
+  const phoneFrameBgColor = viewMode === 'mood' ? activeBgColor : activeDashboardBg;
 
   return (
     <main
@@ -81,7 +122,43 @@ export function App() {
         transitionDuration: typeof continuousValue === 'number' ? '0ms' : '500ms',
       }}
     >
-      {/* Centered Mobile Canvas Frame (Mobile-first 100dvh, subtle bezel & shadow on desktop) */}
+      {/* Floating Quick View Mode Switcher */}
+      <div className="fixed top-4 left-4 z-50 flex items-center gap-2 bg-black/60 backdrop-blur-xl border border-white/15 p-1.5 rounded-full shadow-2xl">
+        <button
+          type="button"
+          onClick={() => setViewMode('celestial')}
+          className="px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 text-white/60 hover:text-white transition cursor-pointer"
+        >
+          <SunMedium size={14} />
+          Celestial Animation
+        </button>
+        <button
+          type="button"
+          onClick={() => setViewMode('mood')}
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+            viewMode === 'mood'
+              ? 'bg-amber-500 text-white shadow-md'
+              : 'text-white/60 hover:text-white'
+          }`}
+        >
+          <Smile size={14} />
+          Mood UI
+        </button>
+        <button
+          type="button"
+          onClick={() => setViewMode('dashboard')}
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+            viewMode === 'dashboard'
+              ? 'bg-amber-500 text-white shadow-md'
+              : 'text-white/60 hover:text-white'
+          }`}
+        >
+          <Sparkles size={14} />
+          Dashboard
+        </button>
+      </div>
+
+      {/* Centered Mobile Canvas Frame */}
       <div
         className="w-full h-[100dvh] md:h-[844px] md:max-h-[92vh] md:max-w-[412px] md:rounded-[48px] md:border-[10px] md:border-black/20 md:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.35),0_0_50px_rgba(0,0,0,0.12)] md:ring-1 md:ring-white/20 overflow-hidden relative flex flex-col transition-colors ease-out"
         style={{
@@ -89,7 +166,7 @@ export function App() {
           transitionDuration: typeof continuousValue === 'number' ? '0ms' : '500ms',
         }}
       >
-        {/* Subtle Desktop Device Notch / Dynamic Island */}
+        {/* Subtle Desktop Device Notch */}
         <div className="hidden md:flex absolute top-3 left-1/2 -translate-x-1/2 w-28 h-5 bg-black/25 rounded-full z-50 pointer-events-none items-center justify-end pr-2.5">
           <div className="w-2.5 h-2.5 rounded-full bg-black/40 ring-1 ring-white/10" />
         </div>
@@ -97,9 +174,9 @@ export function App() {
         {/* Subtle Desktop Home Indicator Bar */}
         <div className="hidden md:block absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-black/20 rounded-full z-50 pointer-events-none" />
 
-        {/* View Transitions: Mood Meter <-> MainAppPlaceholder (Dashboard) */}
+        {/* View Transitions: Mood Meter <-> Dashboard */}
         <AnimatePresence mode="wait">
-          {isMoodMeterOpen ? (
+          {viewMode === 'mood' ? (
             <motion.div
               key="mood-meter"
               initial={{ opacity: 0, scale: 0.96 }}
@@ -111,7 +188,7 @@ export function App() {
             >
               {/* Minimal Top Bar with Dismiss (✕) Button */}
               <TopNav
-                onClose={() => setIsMoodMeterOpen(false)}
+                onClose={() => setViewMode('celestial')}
                 inkColor={activeInkColor}
               />
 
@@ -124,7 +201,6 @@ export function App() {
                   className="w-56 h-56 sm:w-64 sm:h-64"
                 />
 
-                {/* Exactly one text displaying current mood with spring slide-up and fade */}
                 <MoodLabel
                   phase={activePhase}
                   inkColor={activeInkColor}
@@ -157,7 +233,7 @@ export function App() {
             >
               <MainAppPlaceholder
                 currentPhase={currentPhase}
-                onOpenMoodMeter={() => setIsMoodMeterOpen(true)}
+                onOpenMoodMeter={() => setViewMode('mood')}
                 period={currentTime}
                 timeTheme={timeTheme}
                 replayKey={replayKey}
