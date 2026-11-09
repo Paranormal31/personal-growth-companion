@@ -11,7 +11,7 @@ import { MoodFace } from './components/MoodFace';
 import { StepSlider } from './components/StepSlider';
 import { TopNav } from './components/TopNav';
 import { MoodLabel } from './components/MoodLabel';
-import { MainAppPlaceholder } from './components/MainAppPlaceholder';
+import { UnifiedDashboard } from './components/dashboard/UnifiedDashboard';
 import { DesktopTimeDock } from './components/dev/DesktopTimeDock';
 import { CelestialSceneryViewer } from './components/scenery/CelestialSceneryViewer';
 import { useTimeOfDay } from './hooks/useTimeOfDay';
@@ -21,13 +21,14 @@ import { Sparkles, Smile, SunMedium } from 'lucide-react';
  * App — Personal Growth Companion
  *
  * Implements:
- * - Default View: CelestialSceneryViewer — pure custom vector 4-phase scenery & orbital animation
- * - Phase 1: Minimalist Mood Meter UI (character face, mood text, 4-step magnetic slider)
- * - Stage 2: Fabulous-inspired Dashboard with Living Scenic Landscape & Daily Rituals
+ * - Default View: UnifiedDashboard — living celestial landscape with mountain occlusion,
+ *   floating daily ritual checklist grouped by phase, and frosted bottom nav bar.
+ * - Celestial View: Pure 24h orbital scenery simulation viewer.
+ * - Mood UI View: Minimalist mood logging face and 4-step magnetic snapping slider.
  */
 export function App() {
-  // 'celestial' is default primary view showcasing pure vector 4-phase CelestialSceneryViewer
-  const [viewMode, setViewMode] = useState<'celestial' | 'mood' | 'dashboard'>('celestial');
+  // 'dashboard' is the primary default view uniting the living celestial animation with daily rituals
+  const [viewMode, setViewMode] = useState<'dashboard' | 'celestial' | 'mood'>('dashboard');
   const [currentPhase, setCurrentPhase] = useState<MoodPhase>('not_bad');
   const [continuousValue, setContinuousValue] = useState<number | undefined>(undefined);
 
@@ -36,8 +37,6 @@ export function App() {
   const {
     currentTime,
     theme: timeTheme,
-    replayKey,
-    triggerReplay,
   } = timeControls;
 
   // Active phase derived from continuous scrub position or settled discrete phase
@@ -224,21 +223,14 @@ export function App() {
             </motion.div>
           ) : (
             <motion.div
-              key="main-app"
-              initial={{ opacity: 0, scale: 0.96, y: 18 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: -16 }}
-              transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+              key="unified-dashboard"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               className="w-full h-full overflow-hidden relative"
             >
-              <MainAppPlaceholder
-                currentPhase={currentPhase}
-                onOpenMoodMeter={() => setViewMode('mood')}
-                period={currentTime}
-                timeTheme={timeTheme}
-                replayKey={replayKey}
-                onReplay={triggerReplay}
-              />
+              <UnifiedDashboard timeControls={timeControls} />
             </motion.div>
           )}
         </AnimatePresence>
