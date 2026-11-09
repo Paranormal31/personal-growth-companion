@@ -116,7 +116,7 @@ export function App() {
 
   return (
     <main
-      className="relative min-h-[100dvh] w-full flex items-center justify-center p-0 md:p-6 transition-colors ease-out overflow-hidden font-['Outfit']"
+      className="relative min-h-[100dvh] w-full flex flex-col lg:flex-row items-center justify-center gap-8 p-4 md:p-8 transition-colors ease-out overflow-y-auto font-['Outfit']"
       style={{
         backgroundColor: viewportBgColor,
         transitionDuration: typeof continuousValue === 'number' ? '0ms' : '500ms',
@@ -158,9 +158,9 @@ export function App() {
         </button>
       </div>
 
-      {/* Centered Mobile Canvas Frame */}
+      {/* Centered Mobile Canvas Frame (100% Unobstructed) */}
       <div
-        className="w-full h-[100dvh] md:h-[844px] md:max-h-[92vh] md:max-w-[412px] md:rounded-[48px] md:border-[10px] md:border-black/20 md:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.35),0_0_50px_rgba(0,0,0,0.12)] md:ring-1 md:ring-white/20 overflow-hidden relative flex flex-col transition-colors ease-out"
+        className="w-full h-[100dvh] md:h-[844px] md:max-h-[92vh] md:max-w-[412px] md:rounded-[48px] md:border-[10px] md:border-black/20 md:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.35),0_0_50px_rgba(0,0,0,0.12)] md:ring-1 md:ring-white/20 overflow-hidden relative flex flex-col shrink-0 transition-colors ease-out"
         style={{
           backgroundColor: phoneFrameBgColor,
           transitionDuration: typeof continuousValue === 'number' ? '0ms' : '500ms',
@@ -244,12 +244,14 @@ export function App() {
         </AnimatePresence>
       </div>
 
-      {/* Floating Desktop Time Dock outside phone frame */}
-      <DesktopTimeDock
-        timeControls={timeControls}
-        defaultCollapsed={typeof window !== 'undefined' ? window.innerWidth < 768 : false}
-        className="bottom-4 right-4 md:bottom-auto md:top-6 md:right-6"
-      />
+      {/* Companion Desktop Time Dock (Positioned OUTSIDE / BESIDE / BELOW the phone container) */}
+      <div className="w-full max-w-[412px] lg:w-[380px] shrink-0 z-30">
+        <DesktopTimeDock
+          timeControls={timeControls}
+          defaultCollapsed={false}
+          className="relative w-full"
+        />
+      </div>
     </main>
   );
 }

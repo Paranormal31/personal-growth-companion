@@ -203,10 +203,8 @@ export function DesktopTimeDock({
   return (
     <aside
       aria-label="Time of Day Development Controls"
-      className={`fixed z-50 transition-all duration-300 pointer-events-auto ${
-        // Positioning outside phone mockup on desktop (top-right or custom),
-        // and neat bottom-right floating pill on mobile screens
-        className || 'bottom-4 right-4 md:bottom-auto md:top-6 md:right-6'
+      className={`transition-all duration-300 pointer-events-auto ${
+        className || 'relative'
       }`}
     >
       <div
@@ -255,7 +253,7 @@ export function DesktopTimeDock({
           </div>
         ) : (
           /* Expanded Full Dock Panel */
-          <div className="p-3.5 w-[320px] sm:w-[340px] flex flex-col gap-3">
+          <div className="p-3.5 w-full flex flex-col gap-3">
             {/* Header: Label + Clock Toggle Badge + Collapse */}
             <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2.5">
               <div className="flex items-center gap-2">
