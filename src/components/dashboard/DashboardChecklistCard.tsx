@@ -144,7 +144,7 @@ export function DashboardChecklistCard({
   const isPhaseExpanded = (phase: TimeOfDay) => {
     if (expandAll) return true;
     if (userToggles[phase] !== undefined) return userToggles[phase]!;
-    return true; // default all open for effortless viewing
+    return phase === timeOfDay;
   };
 
   const togglePhase = (phase: TimeOfDay) => {
@@ -171,7 +171,7 @@ export function DashboardChecklistCard({
   return (
     <section
       aria-label="Daily rituals checklist"
-      className={`rounded-[32px] backdrop-blur-2xl border shadow-[0_20px_60px_rgba(0,0,0,0.45)] p-4 sm:p-5 flex flex-col gap-3.5 transition-all duration-500 font-['Outfit'] select-none ${className}`}
+      className={`rounded-[32px] backdrop-blur-2xl border shadow-[0_20px_60px_rgba(0,0,0,0.45)] p-4 sm:p-5 flex flex-col gap-3.5 transition-all duration-500 font-['Outfit'] select-none overflow-hidden ${className}`}
       style={{
         backgroundColor: currentPalette.surfaceBg,
         borderColor: currentPalette.border,
@@ -179,7 +179,7 @@ export function DashboardChecklistCard({
       }}
     >
       {/* Header: Title, Actions (Add/Edit), Streak Badge & Progress */}
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2 shrink-0">
         <div className="flex items-center gap-2">
           <div
             className="w-9 h-9 rounded-2xl flex items-center justify-center border shadow-xs transition-colors shrink-0"
@@ -271,7 +271,7 @@ export function DashboardChecklistCard({
 
       {/* Progress Bar with 3-Accent Gradient from Reference */}
       <div
-        className="relative w-full h-2 rounded-full overflow-hidden border"
+        className="relative w-full h-2 rounded-full overflow-hidden border shrink-0"
         style={{
           backgroundColor: 'rgba(0, 0, 0, 0.08)',
           borderColor: currentPalette.border,
@@ -290,7 +290,7 @@ export function DashboardChecklistCard({
       </div>
 
       {/* Grouped Accordions for all 4 Phases */}
-      <div className="flex flex-col gap-2.5 max-h-[32vh] sm:max-h-[36vh] overflow-y-auto pr-0.5 no-scrollbar">
+      <div className="flex-1 min-h-0 flex flex-col gap-2.5 overflow-y-auto pr-0.5 no-scrollbar">
         {PHASE_CONFIGS.map((group) => {
           const groupHabits = habits.filter((h) => h.phase === group.id);
           if (groupHabits.length === 0) return null;

@@ -312,13 +312,14 @@ export function UnifiedDashboard({
       {/* ================================================================ */}
       {/* 3. CENTER / LOWER SCENE: FLOATING DAILY RITUAL CHECKLIST CARD     */}
       {/* ================================================================ */}
-      <main className="absolute inset-x-3.5 sm:inset-x-5 bottom-20 z-10 pointer-events-auto">
+      <main className="absolute inset-x-3.5 sm:inset-x-5 top-[48%] bottom-20 z-10 pointer-events-auto flex flex-col overflow-hidden">
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.25 }}
+          className="w-full h-full flex flex-col overflow-hidden"
         >
           <DashboardChecklistCard
             timeOfDay={currentTimeOfDay}
@@ -328,6 +329,7 @@ export function UnifiedDashboard({
             onToggleHabit={toggleHabit}
             onDeleteHabit={removeHabit}
             onOpenAddHabit={() => setIsAddHabitSheetOpen(true)}
+            className="w-full h-full"
           />
         </motion.div>
       </main>
