@@ -6,6 +6,7 @@ import {
   Sunset,
   Moon,
   Smile,
+  Calendar,
 } from 'lucide-react';
 import type { MoodPhase } from '../../types/mood';
 import type { TimeOfDay, TimeThemeConfig } from '../../types/theme';
@@ -17,6 +18,8 @@ import { BottomNavDock, type DashboardTab } from './BottomNavDock';
 import { DashboardChecklistCard } from './DashboardChecklistCard';
 import { MoodMeterSheet } from './MoodMeterSheet';
 import { SettingsSheet } from './SettingsSheet';
+import { AddHabitSheet } from './AddHabitSheet';
+import { useHabitsStorage } from '../../hooks/useHabitsStorage';
 
 export interface UnifiedDashboardProps {
   /** Optional initial or controlled time-of-day */
@@ -45,34 +48,37 @@ export interface UnifiedDashboardProps {
   };
 }
 
-const PHASE_MAP: Record<TimeOfDay, { progress: number; icon: typeof Sun; color: string; border: string; glow: string }> = {
+const PHASE_MAP: Record<
+  TimeOfDay,
+  { progress: number; icon: typeof Sun; color: string; border: string; glow: string }
+> = {
   morning: {
     progress: 0.0,
     icon: Sun,
-    color: '#FF9F43',
-    border: 'rgba(255, 230, 190, 0.55)',
-    glow: 'rgba(251, 164, 134, 0.45)',
+    color: '#FF6B6B',
+    border: 'rgba(255, 107, 107, 0.4)',
+    glow: 'rgba(255, 107, 107, 0.3)',
   },
   afternoon: {
     progress: 1.0,
     icon: SunMedium,
-    color: '#4DA8F5',
-    border: 'rgba(191, 231, 255, 0.55)',
-    glow: 'rgba(77, 168, 245, 0.45)',
+    color: '#4C9EFF',
+    border: 'rgba(76, 158, 255, 0.4)',
+    glow: 'rgba(76, 158, 255, 0.3)',
   },
   evening: {
     progress: 2.0,
     icon: Sunset,
-    color: '#F27B35',
-    border: 'rgba(255, 190, 150, 0.55)',
-    glow: 'rgba(242, 123, 53, 0.45)',
+    color: '#8E7CFB',
+    border: 'rgba(142, 124, 251, 0.4)',
+    glow: 'rgba(142, 124, 251, 0.3)',
   },
   night: {
     progress: 3.0,
     icon: Moon,
-    color: '#818CF8',
-    border: 'rgba(199, 210, 254, 0.55)',
-    glow: 'rgba(99, 102, 241, 0.45)',
+    color: '#4F46E5',
+    border: 'rgba(167, 139, 250, 0.4)',
+    glow: 'rgba(79, 70, 229, 0.3)',
   },
 };
 
@@ -81,10 +87,10 @@ const PHASE_MAP: Record<TimeOfDay, { progress: number; icon: typeof Sun; color: 
  *
  * Flagship screen integrating:
  * 1. Living procedural celestial landscape vector background with physical mountain occlusion
- * 2. Top minimal frosted sky badge with period info and mood indicator
- * 3. Daily ritual checklist card floating over the lower scenery
- * 4. Frosted bottom navigation dock (Today, Rituals, Mood, Settings)
- * 5. Slide-up drawers for Mood Meter and Settings
+ * 2. Top minimal frosted sky badge with exact reference period titles and mood indicator
+ * 3. Daily ritual checklist card with habit CRUD (Add, Toggle, Delete) and localStorage persistence
+ * 4. Frosted bottom navigation dock (Today, Rituals, Mood, Settings) with reference themes
+ * 5. Slide-up drawers for Add Habit, Mood Meter, and Settings
  */
 export function UnifiedDashboard({
   initialTimeOfDay = 'morning',
@@ -96,10 +102,21 @@ export function UnifiedDashboard({
 }: UnifiedDashboardProps) {
   const activeTimeControls = timeControls ?? propExternalTimeControls;
 
+  // Habit CRUD and localStorage persistence hook
+  const {
+    habits,
+    addHabit,
+    removeHabit,
+    toggleHabit,
+    resetCompletions,
+    restoreDefaults,
+  } = useHabitsStorage();
+
   // Navigation & Modal sheets state
   const [activeTab, setActiveTab] = useState<DashboardTab>('dashboard');
   const [isMoodSheetOpen, setIsMoodSheetOpen] = useState(false);
   const [isSettingsSheetOpen, setIsSettingsSheetOpen] = useState(false);
+  const [isAddHabitSheetOpen, setIsAddHabitSheetOpen] = useState(false);
 
   // Mood state
   const [moodPhase, setMoodPhase] = useState<MoodPhase>(propMoodPhase ?? 'not_bad');
@@ -108,7 +125,8 @@ export function UnifiedDashboard({
   // Time-of-day state
   const [internalTimeOfDay, setInternalTimeOfDay] = useState<TimeOfDay>(initialTimeOfDay);
   const currentTimeOfDay = activeTimeControls?.currentTime ?? internalTimeOfDay;
-  const currentTheme = activeTimeControls?.theme ?? (TIME_THEMES[currentTimeOfDay] ?? getTimeTheme(currentTimeOfDay));
+  const currentTheme =
+    activeTimeControls?.theme ?? (TIME_THEMES[currentTimeOfDay] ?? getTimeTheme(currentTimeOfDay));
 
   // Celestial 24h simulation loop
   const [isAutoPlay, setIsAutoPlay] = useState(false);
@@ -120,7 +138,8 @@ export function UnifiedDashboard({
 
   // Derived progress: if autoPlay is active and autoPlayProgress is set, use it; otherwise use static phase progress
   const staticProgress = PHASE_MAP[currentTimeOfDay]?.progress ?? 0;
-  const continuousProgress = isAutoPlay && autoPlayProgress !== null ? autoPlayProgress : staticProgress;
+  const continuousProgress =
+    isAutoPlay && autoPlayProgress !== null ? autoPlayProgress : staticProgress;
 
   // Continuous loop runner
   useEffect(() => {
@@ -204,6 +223,15 @@ export function UnifiedDashboard({
   // Active Mood config
   const activeMoodTheme = MOOD_THEMES[moodPhase] ?? MOOD_THEMES.not_bad;
 
+  // Today Date formatted string
+  const [todayDateString] = useState(() => {
+    return new Date().toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
+  });
+
   return (
     <div
       className={`relative w-full h-full overflow-hidden select-none font-['Outfit'] ${className}`}
@@ -233,7 +261,7 @@ export function UnifiedDashboard({
       {/* 2. TOP MINIMAL SKY BADGE & MOOD INDICATOR                        */}
       {/* ================================================================ */}
       <header className="absolute top-3.5 sm:top-5 inset-x-3.5 sm:inset-x-5 z-20 flex items-center justify-between pointer-events-none">
-        {/* Living Time-of-Day Pill */}
+        {/* Living Time-of-Day Tag Pill */}
         <motion.button
           type="button"
           onClick={() => setIsSettingsSheetOpen(true)}
@@ -254,24 +282,31 @@ export function UnifiedDashboard({
           </span>
         </motion.button>
 
-        {/* Quick Mood Pill / Check-in Trigger */}
-        <motion.button
-          type="button"
-          onClick={() => setIsMoodSheetOpen(true)}
-          whileTap={{ scale: 0.95 }}
-          className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-900/80 backdrop-blur-xl border border-white/20 text-stone-100 shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:border-white/35 transition-colors cursor-pointer"
-          title="Log Your Mood"
-        >
-          <div
-            className="w-4 h-4 rounded-full flex items-center justify-center shrink-0 border border-white/20"
-            style={{ backgroundColor: activeMoodTheme.color }}
-          >
-            <Smile className="w-3 h-3 text-stone-900" />
+        {/* Date and Quick Mood Pill */}
+        <div className="flex items-center gap-1.5">
+          <div className="hidden xs:flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-black/40 backdrop-blur-xl border border-white/15 text-white/90 text-xs font-medium shadow-xs">
+            <Calendar className="w-3 h-3 opacity-70" />
+            <span>{todayDateString}</span>
           </div>
-          <span className="text-xs font-semibold tracking-tight text-white capitalize">
-            {activeMoodTheme.label}
-          </span>
-        </motion.button>
+
+          <motion.button
+            type="button"
+            onClick={() => setIsMoodSheetOpen(true)}
+            whileTap={{ scale: 0.95 }}
+            className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-xl border border-white/20 text-stone-100 shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:border-white/35 transition-colors cursor-pointer"
+            title="Log Your Mood"
+          >
+            <div
+              className="w-4 h-4 rounded-full flex items-center justify-center shrink-0 border border-white/20"
+              style={{ backgroundColor: activeMoodTheme.color }}
+            >
+              <Smile className="w-3 h-3 text-stone-900" />
+            </div>
+            <span className="text-xs font-semibold tracking-tight text-white capitalize">
+              {activeMoodTheme.label}
+            </span>
+          </motion.button>
+        </div>
       </header>
 
       {/* ================================================================ */}
@@ -288,7 +323,11 @@ export function UnifiedDashboard({
           <DashboardChecklistCard
             timeOfDay={currentTimeOfDay}
             theme={currentTheme}
+            habits={habits}
             expandAll={activeTab === 'habits'}
+            onToggleHabit={toggleHabit}
+            onDeleteHabit={removeHabit}
+            onOpenAddHabit={() => setIsAddHabitSheetOpen(true)}
           />
         </motion.div>
       </main>
@@ -300,12 +339,22 @@ export function UnifiedDashboard({
         <BottomNavDock
           activeTab={activeTab}
           onTabChange={handleTabChange}
+          timeOfDay={currentTimeOfDay}
         />
       </div>
 
       {/* ================================================================ */}
-      {/* 5. SLIDE-UP MODAL SHEETS (Mood Meter & Settings)                 */}
+      {/* 5. SLIDE-UP MODAL SHEETS                                         */}
       {/* ================================================================ */}
+      {/* Add New Habit Sheet */}
+      <AddHabitSheet
+        isOpen={isAddHabitSheetOpen}
+        onClose={() => setIsAddHabitSheetOpen(false)}
+        onAddHabit={addHabit}
+        activePhase={currentTimeOfDay}
+      />
+
+      {/* Mood Meter Sheet */}
       <MoodMeterSheet
         isOpen={isMoodSheetOpen}
         onClose={() => setIsMoodSheetOpen(false)}
@@ -318,6 +367,7 @@ export function UnifiedDashboard({
         onContinuousChange={(val) => setContinuousMoodValue(val)}
       />
 
+      {/* Settings Sheet */}
       <SettingsSheet
         isOpen={isSettingsSheetOpen}
         onClose={() => setIsSettingsSheetOpen(false)}
@@ -326,6 +376,8 @@ export function UnifiedDashboard({
         theme={currentTheme}
         isAutoPlay={isAutoPlay}
         onToggleAutoPlay={() => setIsAutoPlay((prev) => !prev)}
+        onResetHabits={resetCompletions}
+        onRestoreDefaults={restoreDefaults}
         cycleDuration={cycleDuration}
         onCycleDurationChange={(dur) => setCycleDuration(dur)}
       />

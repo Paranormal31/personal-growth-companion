@@ -13,5 +13,8 @@ export type { MoodMeterSheetProps } from './MoodMeterSheet';
 export { SettingsSheet } from './SettingsSheet';
 export type { SettingsSheetProps } from './SettingsSheet';
 
+export { AddHabitSheet } from './AddHabitSheet';
+export type { AddHabitSheetProps } from './AddHabitSheet';
+
 export { UnifiedDashboard } from './UnifiedDashboard';
 export type { UnifiedDashboardProps } from './UnifiedDashboard';

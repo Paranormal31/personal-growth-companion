@@ -32,7 +32,7 @@ export const TIME_THEMES: Record<TimeOfDay, TimeThemeConfig> = {
     tag: 'Bright Beginnings',
     greeting: 'Good Morning',
     title: 'Bright Beginnings',
-    subtitle: 'Embrace fresh energy and gentle intention for today.',
+    subtitle: 'Energetic, warm and motivating. Perfect for starting the day.',
     colors: createColors(
       '#FF6B6B', // Sunrise crimson / coral
       '#FFA07A', // Warm salmon / apricot
@@ -48,7 +48,7 @@ export const TIME_THEMES: Record<TimeOfDay, TimeThemeConfig> = {
     tag: 'Steady Progress',
     greeting: 'Good Afternoon',
     title: 'Steady Progress',
-    subtitle: 'Keep your momentum steady with focused, calm steps forward.',
+    subtitle: 'Focused, fresh and balanced. Keep going through the day.',
     colors: createColors(
       '#4C9EFF', // Clear sky blue
       '#7EC8FF', // Soft daylight cyan
@@ -64,7 +64,7 @@ export const TIME_THEMES: Record<TimeOfDay, TimeThemeConfig> = {
     tag: 'Unwind & Reflect',
     greeting: 'Good Evening',
     title: 'Unwind & Reflect',
-    subtitle: 'Acknowledge your efforts and softly ease into serenity.',
+    subtitle: 'Calm, elegant and introspective. Wind down and check in.',
     colors: createColors(
       '#8E7CFB', // Twilight lavender
       '#C9B8FF', // Soft lilac mist
@@ -80,7 +80,7 @@ export const TIME_THEMES: Record<TimeOfDay, TimeThemeConfig> = {
     tag: 'Rest & Recharge',
     greeting: 'Good Night',
     title: 'Rest & Recharge',
-    subtitle: 'Release all thoughts and surrender to deep, restorative peace.',
+    subtitle: 'Peaceful, cozy and comforting. End the day with kindness.',
     colors: createColors(
       '#1E1B4B', // Midnight indigo
       '#4F46E5', // Royal starlight indigo

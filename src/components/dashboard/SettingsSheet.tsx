@@ -25,6 +25,7 @@ export interface SettingsSheetProps {
   isAutoPlay?: boolean;
   onToggleAutoPlay?: () => void;
   onResetHabits?: () => void;
+  onRestoreDefaults?: () => void;
   cycleDuration?: number;
   onCycleDurationChange?: (duration: number) => void;
 }
@@ -38,10 +39,10 @@ interface PeriodOption {
 }
 
 const PERIOD_OPTIONS: PeriodOption[] = [
-  { id: 'morning', label: 'Morning', tag: 'Bright Beginnings', icon: Sun, color: '#FF9F43' },
-  { id: 'afternoon', label: 'Afternoon', tag: 'Steady Progress', icon: SunMedium, color: '#4DA8F5' },
-  { id: 'evening', label: 'Evening', tag: 'Unwind & Reflect', icon: Sunset, color: '#F27B35' },
-  { id: 'night', label: 'Night', tag: 'Rest & Recharge', icon: Moon, color: '#818CF8' },
+  { id: 'morning', label: 'Morning', tag: 'Bright Beginnings', icon: Sun, color: '#FF6B6B' },
+  { id: 'afternoon', label: 'Afternoon', tag: 'Steady Progress', icon: SunMedium, color: '#4C9EFF' },
+  { id: 'evening', label: 'Evening', tag: 'Unwind & Reflect', icon: Sunset, color: '#8E7CFB' },
+  { id: 'night', label: 'Night', tag: 'Rest & Recharge', icon: Moon, color: '#4F46E5' },
 ];
 
 /**
@@ -59,6 +60,7 @@ export function SettingsSheet({
   isAutoPlay = false,
   onToggleAutoPlay,
   onResetHabits,
+  onRestoreDefaults,
   cycleDuration = 16,
   onCycleDurationChange,
 }: SettingsSheetProps) {
@@ -234,30 +236,56 @@ export function SettingsSheet({
               )}
             </section>
 
-            {/* Section 3: Reset Habits */}
-            {onResetHabits && (
-              <section className="flex items-center justify-between rounded-2xl bg-black/35 border border-white/10 p-3.5">
-                <div className="flex items-center gap-2">
-                  <RotateCcw className="w-4 h-4 text-stone-400" />
-                  <div>
-                    <h4 className="text-xs font-bold text-stone-200">
-                      Reset Daily Rituals
-                    </h4>
-                    <p className="text-[10px] text-stone-400">
-                      Uncheck all items to restart your day
-                    </p>
+            {/* Section 3: Reset / Restore Habits */}
+            <div className="flex flex-col gap-2">
+              {onResetHabits && (
+                <section className="flex items-center justify-between rounded-2xl bg-black/35 border border-white/10 p-3.5">
+                  <div className="flex items-center gap-2">
+                    <RotateCcw className="w-4 h-4 text-stone-400" />
+                    <div>
+                      <h4 className="text-xs font-bold text-stone-200">
+                        Reset Today's Checks
+                      </h4>
+                      <p className="text-[10px] text-stone-400">
+                        Uncheck all items to restart your day
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <button
-                  type="button"
-                  onClick={onResetHabits}
-                  className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-stone-800 hover:bg-stone-700 text-stone-200 hover:text-white border border-white/10 transition cursor-pointer"
-                >
-                  Reset
-                </button>
-              </section>
-            )}
+                  <button
+                    type="button"
+                    onClick={onResetHabits}
+                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-stone-800 hover:bg-stone-700 text-stone-200 hover:text-white border border-white/10 transition cursor-pointer"
+                  >
+                    Reset
+                  </button>
+                </section>
+              )}
+
+              {onRestoreDefaults && (
+                <section className="flex items-center justify-between rounded-2xl bg-black/35 border border-white/10 p-3.5">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    <div>
+                      <h4 className="text-xs font-bold text-stone-200">
+                        Restore Default Habits
+                      </h4>
+                      <p className="text-[10px] text-stone-400">
+                        Restore reference sample rituals
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={onRestoreDefaults}
+                    className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/30 transition cursor-pointer"
+                  >
+                    Restore
+                  </button>
+                </section>
+              )}
+            </div>
 
             {/* Section 4: Architecture Info */}
             <div className="px-1 pt-1 flex items-center justify-between text-[10px] text-stone-400">
