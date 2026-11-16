@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'Space Grotesk', monospace;
+  
+  --color-neo-bg: #FFFDF5;
+  --color-neo-canvas: #F4F0E6;
+  --color-neo-lime: #D4F972;
+  --color-neo-lime-bright: #B8F25A;
+  --color-neo-yellow: #FDE047;
+  --color-neo-yellow-gold: #FFD027;
+  --color-neo-pink: #F9A8D4;
+  --color-neo-pink-bold: #FF70A6;
+  --color-neo-cyan: #7DD3FC;
+  --color-neo-lavender: #DDD6FE;
+  --color-neo-peach: #FED7AA;
+  --color-neo-border: #000000;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: #000000;
+    background-color: #F4F0E6;
+  }
+}
+
+/* Neo-Brutalist Hard Shadow Helpers */
+.neo-border {
+  border: 2.5px solid #000000;
+}
+
+.neo-border-thick {
+  border: 3px solid #000000;
+}
+
+.neo-shadow-sm {
+  box-shadow: 2px 2px 0px #000000;
+}
+
+.neo-shadow {
+  box-shadow: 3px 3px 0px #000000;
+}
+
+.neo-shadow-lg {
+  box-shadow: 4px 4px 0px #000000;
+}
+
+.neo-shadow-phone {
+  box-shadow: 12px 14px 0px #000000;
+}
+
+.neo-pressable {
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.neo-pressable:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000000 !important;
+}
+
+/* Custom scrollbar hiding */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,0 +1,56 @@
+import { Habit } from '../types/habit'
+
+export const INITIAL_HABITS: Habit[] = [
+  {
+    id: 'habit-1',
+    name: 'Workout',
+    streak: 5,
+    completed: true,
+    category: 'workout',
+    accentColor: '#F9A8D4', // Pastel Pink
+    iconName: 'dumbbell',
+    startTime: '7:00 AM',
+    endTime: '7:30 AM',
+    activeDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    type: 'task',
+  },
+  {
+    id: 'habit-2',
+    name: 'Hydrate',
+    streak: 3,
+    completed: true,
+    category: 'hydrate',
+    accentColor: '#7DD3FC', // Pastel Cyan
+    iconName: 'droplet',
+    startTime: '8:00 AM',
+    endTime: '8:30 AM',
+    activeDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    type: 'task',
+  },
+  {
+    id: 'habit-3',
+    name: 'Read',
+    streak: 1,
+    completed: false,
+    category: 'read',
+    accentColor: '#DDD6FE', // Pastel Lavender
+    iconName: 'book',
+    startTime: '9:00 AM',
+    endTime: '10:00 AM',
+    activeDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    type: 'task',
+  },
+  {
+    id: 'habit-4',
+    name: 'Meditate',
+    streak: 7,
+    completed: true,
+    category: 'meditate',
+    accentColor: '#FED7AA', // Pastel Peach / Orange
+    iconName: 'meditate',
+    startTime: '3:00 PM',
+    endTime: '3:30 PM',
+    activeDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    type: 'event',
+  },
+]
