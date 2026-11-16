@@ -7,11 +7,12 @@ export interface Habit {
   completed: boolean
   category: 'workout' | 'hydrate' | 'read' | 'meditate' | 'meal' | 'work' | 'event' | string
   accentColor: string
-  iconName: 'dumbbell' | 'droplet' | 'book' | 'meditate' | 'utensils' | 'laptop' | 'users' | string
-  startTime: string
-  endTime: string
+  iconName: string
+  startTime?: string
+  endTime?: string
   activeDays: Weekday[]
-  completedDates?: Record<string, boolean> // 'YYYY-MM-DD' -> boolean
+  weeklyCompletions?: Partial<Record<Weekday, boolean>>
+  completedDates?: Record<string, boolean>
   type?: 'task' | 'event'
 }
 

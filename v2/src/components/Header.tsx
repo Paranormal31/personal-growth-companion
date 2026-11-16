@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { User, Bell, RotateCcw, CheckCheck, RefreshCw } from 'lucide-react'
+import { User, Bell, Plus, RotateCcw, CheckCheck, RefreshCw } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface HeaderProps {
+  onOpenAddHabit: () => void
   onResetDemo: () => void
   onCompleteAll: () => void
   onClearAll: () => void
@@ -10,21 +11,13 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
+  onOpenAddHabit,
   onResetDemo,
   onCompleteAll,
   onClearAll,
   onNotify,
 }) => {
   const [profileOpen, setProfileOpen] = useState(false)
-  const [isDayTime, setIsDayTime] = useState(true)
-
-  const greeting = isDayTime ? 'Good Morning.' : 'Good Evening.'
-
-  const toggleDayNight = () => {
-    const nextDay = !isDayTime
-    setIsDayTime(nextDay)
-    onNotify(nextDay ? 'Switched to Day Mode (Good Morning) ☀️' : 'Switched to Night Mode (Good Evening) 🌙')
-  }
 
   return (
     <header className="relative w-full pt-1 pb-3 shrink-0">
@@ -57,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={() => {
                       onResetDemo()
                       setProfileOpen(false)
-                      onNotify('Reset to Reference Image (3/4)!')
+                      onNotify('Reset to default habits (3/4)!')
                     }}
                     className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-bold text-black hover:bg-[#FDE047] flex items-center gap-2 neo-border transition-colors cursor-pointer"
                   >
@@ -103,63 +96,28 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
       </div>
 
-      {/* Greeting and Sun Tile Row */}
+      {/* Heading and Yellow Plus Button Row */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[30px] font-black text-black leading-none tracking-tight">
-            {greeting}
+            Habit Tracker<span className="text-[#FDE047]">.</span>
           </h1>
-          <p className="text-[13px] font-bold text-black/80 mt-1 flex items-center gap-1">
-            Let&apos;s make today count! <span className="text-sm">✨</span>
+          <p className="text-[13px] font-bold text-black/80 mt-1">
+            Build consistency, one day at a time.
           </p>
         </div>
 
-        {/* Yellow Sun / Celestial Neo-Brutalist Tile (Click to toggle day/night) */}
+        {/* Top-Right Yellow Plus Button for Adding Habits */}
         <motion.button
           type="button"
-          whileHover={{ rotate: 8, scale: 1.05 }}
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={toggleDayNight}
-          className="w-14 h-14 bg-[#FDE047] neo-border neo-shadow rounded-2xl flex items-center justify-center select-none cursor-pointer"
-          title="Click to toggle Day/Night greeting"
-          aria-label="Toggle Sun/Moon greeting"
+          onClick={onOpenAddHabit}
+          className="w-12 h-12 bg-[#FDE047] neo-border neo-shadow rounded-2xl flex items-center justify-center select-none cursor-pointer"
+          title="Add New Habit"
+          aria-label="Add New Habit"
         >
-          {isDayTime ? (
-            /* Custom Line Art Sun matching reference exactly */
-            <svg
-              width="34"
-              height="34"
-              viewBox="0 0 36 36"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="text-black"
-            >
-              <circle cx="18" cy="18" r="7" stroke="#000000" strokeWidth="2.4" />
-              {/* Rays */}
-              <line x1="18" y1="3" x2="18" y2="7.5" stroke="#000000" strokeWidth="2.4" strokeLinecap="round" />
-              <line x1="18" y1="28.5" x2="18" y2="33" stroke="#000000" strokeWidth="2.4" strokeLinecap="round" />
-              <line x1="3" y1="18" x2="7.5" y2="18" stroke="#000000" strokeWidth="2.4" strokeLinecap="round" />
-              <line x1="28.5" y1="18" x2="33" y2="18" stroke="#000000" strokeWidth="2.4" strokeLinecap="round" />
-              <line x1="7.4" y1="7.4" x2="10.5" y2="10.5" stroke="#000000" strokeWidth="2.4" strokeLinecap="round" />
-              <line x1="25.5" y1="25.5" x2="28.6" y2="28.6" stroke="#000000" strokeWidth="2.4" strokeLinecap="round" />
-              <line x1="7.4" y1="28.6" x2="10.5" y2="25.5" stroke="#000000" strokeWidth="2.4" strokeLinecap="round" />
-              <line x1="25.5" y1="10.5" x2="28.6" y2="7.4" stroke="#000000" strokeWidth="2.4" strokeLinecap="round" />
-            </svg>
-          ) : (
-            /* Moon variant */
-            <svg
-              width="30"
-              height="30"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#000000"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          )}
+          <Plus className="w-6 h-6 text-black stroke-[3]" />
         </motion.button>
       </div>
     </header>

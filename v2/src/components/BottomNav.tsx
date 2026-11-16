@@ -1,69 +1,79 @@
 import React from 'react'
-import { Home, Calendar, Plus, BarChart2, User } from 'lucide-react'
+import { CheckSquare, Dumbbell, Home, Wallet, User } from 'lucide-react'
 
 interface BottomNavProps {
-  activeScreen?: 'home' | 'schedule'
-  onNavigate: (screen: 'home' | 'schedule') => void
-  onPlaceholderClick: (name: string) => void
+  onPlaceholderClick: (name: string, description: string) => void
 }
 
 export const BottomNav: React.FC<BottomNavProps> = ({
-  activeScreen = 'home',
-  onNavigate,
   onPlaceholderClick,
 }) => {
   return (
-    <nav className="w-full mt-3 select-none shrink-0" aria-label="Bottom Navigation">
-      <div className="w-full bg-white neo-border neo-shadow rounded-2xl px-2.5 py-1.5 flex items-center justify-between">
-        {/* Home Tab */}
+    <nav className="w-full mt-2 select-none shrink-0" aria-label="Bottom Navigation">
+      <div className="w-full bg-white neo-border neo-shadow rounded-2xl px-2 py-1.5 flex items-center justify-between">
+        {/* 1. Habit Tab (Active) */}
         <button
-          onClick={() => onNavigate('home')}
-          className={`w-11 h-10 rounded-xl flex items-center justify-center neo-pressable cursor-pointer ${
-            activeScreen === 'home'
-              ? 'bg-[#FDE047] neo-border neo-shadow-sm font-black'
-              : 'text-black hover:opacity-75'
-          }`}
-          aria-label="Home Screen"
+          className="w-11 h-10 bg-[#FDE047] neo-border rounded-xl flex items-center justify-center neo-pressable neo-shadow-sm cursor-pointer"
+          aria-label="Habits Screen (Active)"
         >
-          <Home className="w-5 h-5 text-black stroke-[2.5]" />
+          {/* Rounded checkbox icon matching the reference */}
+          <div className="w-6 h-6 rounded-md border-2 border-black flex items-center justify-center">
+            <CheckSquare className="w-4 h-4 text-black stroke-[3]" />
+          </div>
         </button>
 
-        {/* Calendar / Schedule Tab (Active on Screen 2) */}
+        {/* 2. Gym Tab (Placeholder) */}
         <button
-          onClick={() => onNavigate('schedule')}
-          className={`w-11 h-10 rounded-xl flex items-center justify-center neo-pressable cursor-pointer ${
-            activeScreen === 'schedule'
-              ? 'bg-[#FDE047] neo-border neo-shadow-sm font-black'
-              : 'text-black hover:opacity-75'
-          }`}
-          aria-label="Plan & Schedule Screen"
-        >
-          <Calendar className="w-5 h-5 text-black stroke-[2.4]" />
-        </button>
-
-        {/* Add Tab (+) - Placeholder per User Decision */}
-        <button
-          onClick={() => onPlaceholderClick('Add')}
-          className="w-10 h-10 bg-white neo-border neo-shadow-sm rounded-xl flex items-center justify-center neo-pressable cursor-pointer"
-          aria-label="Add Habit (Placeholder)"
-        >
-          <Plus className="w-5 h-5 text-black stroke-[3]" />
-        </button>
-
-        {/* Analytics Tab (Placeholder) */}
-        <button
-          onClick={() => onPlaceholderClick('Analytics')}
+          onClick={() =>
+            onPlaceholderClick(
+              'Gym',
+              'Workout logging, exercise history & fitness progress'
+            )
+          }
           className="w-10 h-10 flex items-center justify-center text-black hover:opacity-75 neo-pressable cursor-pointer"
-          aria-label="Analytics (Placeholder)"
+          aria-label="Gym Screen (Placeholder)"
         >
-          <BarChart2 className="w-5 h-5 text-black stroke-[2.2]" />
+          <Dumbbell className="w-5 h-5 text-black stroke-[2.2]" />
         </button>
 
-        {/* Profile Tab (Placeholder) */}
+        {/* 3. Home Tab (Central - replaces previous Plus button) */}
         <button
-          onClick={() => onPlaceholderClick('Profile')}
+          onClick={() =>
+            onPlaceholderClick(
+              'Home',
+              'Overview connecting Habits, Gym, and Budget'
+            )
+          }
           className="w-10 h-10 flex items-center justify-center text-black hover:opacity-75 neo-pressable cursor-pointer"
-          aria-label="Profile (Placeholder)"
+          aria-label="Home Overview (Placeholder)"
+        >
+          <Home className="w-5 h-5 text-black stroke-[2.2]" />
+        </button>
+
+        {/* 4. Budget Tab (Placeholder) */}
+        <button
+          onClick={() =>
+            onPlaceholderClick(
+              'Budget',
+              'Income, expenses, savings & financial tracking'
+            )
+          }
+          className="w-10 h-10 flex items-center justify-center text-black hover:opacity-75 neo-pressable cursor-pointer"
+          aria-label="Budget Screen (Placeholder)"
+        >
+          <Wallet className="w-5 h-5 text-black stroke-[2.2]" />
+        </button>
+
+        {/* 5. Profile Tab (Placeholder) */}
+        <button
+          onClick={() =>
+            onPlaceholderClick(
+              'Profile',
+              'Personal settings, preferences & application configs'
+            )
+          }
+          className="w-10 h-10 flex items-center justify-center text-black hover:opacity-75 neo-pressable cursor-pointer"
+          aria-label="Profile Screen (Placeholder)"
         >
           <User className="w-5 h-5 text-black stroke-[2.2]" />
         </button>

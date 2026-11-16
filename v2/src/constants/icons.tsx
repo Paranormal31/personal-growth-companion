@@ -160,17 +160,16 @@ export const ICON_CATEGORIES: IconCategory[] = [
   },
 ]
 
-// 3x3 Pastel Color Palette
+// 8 Pastel Color Options (4 per row, 2 rows)
 export const COLOR_SWATCHES = [
-  '#FF70A6', // Accent Pink / Magenta
-  '#FDE047', // Accent Yellow
+  '#FF70A6', // Accent Pink
+  '#FFD027', // Accent Yellow
   '#B8F25A', // Accent Lime Green
   '#56CFE1', // Accent Sky Cyan
   '#C7B9FF', // Accent Lavender
   '#FFAC81', // Accent Peach
   '#93C5FD', // Soft Periwinkle
-  '#86EFAC', // Soft Mint
-  '#F0ABFC', // Soft Bubblegum
+  '#F0ABFC', // Soft Bubblegum / Lilac
 ]
 
 // Universal Icon Resolver

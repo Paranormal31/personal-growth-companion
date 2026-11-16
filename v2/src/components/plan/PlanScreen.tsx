@@ -137,9 +137,9 @@ export const PlanScreen: React.FC<PlanScreenProps> = ({
 
         {/* Bottom Navigation is permanently anchored here */}
         <BottomNav
-          activeScreen="schedule"
-          onNavigate={onNavigate}
-          onPlaceholderClick={handlePlaceholderTab}
+          onPlaceholderClick={(name, desc) =>
+            onNotify(`📍 ${name} coming soon: ${desc}`)
+          }
         />
       </div>
 
