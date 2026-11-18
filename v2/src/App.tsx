@@ -212,8 +212,8 @@ export const App: React.FC = () => {
 
   // Habits Handlers (100% Preserved)
   const handleToggleHabit = (id: string) => {
-    setHabits((prev) => {
-      const updated = prev.map((h) => {
+    setHabits((prev) =>
+      prev.map((h) => {
         if (h.id === id) {
           const nextCompleted = !h.completed
           const nextWeekly = {
@@ -235,21 +235,7 @@ export const App: React.FC = () => {
         }
         return h
       })
-
-      const allActiveCompleted = updated
-        .filter((h) => h.activeDays.includes(currentWeekday))
-        .every((h) => h.completed)
-
-      const prevCompletedCount = prev.filter((h) => h.completed).length
-      const newCompletedCount = updated.filter((h) => h.completed).length
-
-      if (allActiveCompleted && newCompletedCount > prevCompletedCount) {
-        triggerCelebration()
-        setToastMessage('🎉 All habits completed for today! Awesome work!')
-      }
-
-      return updated
-    })
+    )
   }
 
   const handleToggleDay = (habitId: string, day: Weekday) => {
@@ -328,7 +314,6 @@ export const App: React.FC = () => {
         }
       })
     )
-    triggerCelebration()
   }
 
   const handleClearAll = () => {
