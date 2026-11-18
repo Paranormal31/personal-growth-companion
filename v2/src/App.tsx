@@ -29,6 +29,62 @@ const WEEKDAY_NAMES: Weekday[] = [
   'Sat',
 ]
 
+const ALL_WEEKDAYS_ORDER: Weekday[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+export const computeHabitStreak = (
+  weeklyCompletions: Partial<Record<Weekday, boolean>> | undefined,
+  activeDays: Weekday[],
+  todayWeekday: Weekday,
+  fallbackStreak: number = 0
+): number => {
+  if (!weeklyCompletions) return 0
+
+  const completedCount = ALL_WEEKDAYS_ORDER.filter(
+    (d) => weeklyCompletions[d]
+  ).length
+
+  // If every day in the week is unchecked, streak is strictly 0
+  if (completedCount === 0) {
+    return 0
+  }
+
+  const todayIdx = ALL_WEEKDAYS_ORDER.indexOf(todayWeekday)
+  const isTodayDone = !!weeklyCompletions[todayWeekday]
+
+  // Count consecutive completed scheduled days ending at today (or yesterday if today is not done yet)
+  let streak = 0
+  if (isTodayDone) {
+    streak = 1
+    for (let i = todayIdx - 1; i >= 0; i--) {
+      const day = ALL_WEEKDAYS_ORDER[i]
+      if (!activeDays.includes(day)) continue
+      if (weeklyCompletions[day]) {
+        streak++
+      } else {
+        break
+      }
+    }
+  } else {
+    // Today not checked yet - check if yesterday was completed
+    for (let i = todayIdx - 1; i >= 0; i--) {
+      const day = ALL_WEEKDAYS_ORDER[i]
+      if (!activeDays.includes(day)) continue
+      if (weeklyCompletions[day]) {
+        streak++
+      } else {
+        break
+      }
+    }
+  }
+
+  // Preserve prior multi-week streak if all scheduled days up to today are completed
+  if (streak > 0 && fallbackStreak > 7) {
+    return streak + (fallbackStreak - 7)
+  }
+
+  return streak
+}
+
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavTab>('habit')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -48,22 +104,31 @@ export const App: React.FC = () => {
             INITIAL_HABITS.find(
               (init) => init.name.toLowerCase() === h.name.toLowerCase()
             ) || INITIAL_HABITS[idx % INITIAL_HABITS.length]
+          const weekly = h.weeklyCompletions || defaultHabit.weeklyCompletions
+          const activeDays =
+            h.activeDays ||
+            defaultHabit.activeDays || [
+              'Mon',
+              'Tue',
+              'Wed',
+              'Thu',
+              'Fri',
+              'Sat',
+              'Sun',
+            ]
+          const streak = computeHabitStreak(
+            weekly,
+            activeDays,
+            currentWeekday,
+            h.streak ?? defaultHabit.streak
+          )
+
           return {
             ...defaultHabit,
             ...h,
-            activeDays:
-              h.activeDays ||
-              defaultHabit.activeDays || [
-                'Mon',
-                'Tue',
-                'Wed',
-                'Thu',
-                'Fri',
-                'Sat',
-                'Sun',
-              ],
-            weeklyCompletions:
-              h.weeklyCompletions || defaultHabit.weeklyCompletions,
+            streak,
+            activeDays,
+            weeklyCompletions: weekly,
             startTime: h.startTime || defaultHabit.startTime,
             endTime: h.endTime || defaultHabit.endTime,
             type: h.type || defaultHabit.type || 'task',
@@ -151,14 +216,21 @@ export const App: React.FC = () => {
       const updated = prev.map((h) => {
         if (h.id === id) {
           const nextCompleted = !h.completed
+          const nextWeekly = {
+            ...(h.weeklyCompletions || {}),
+            [currentWeekday]: nextCompleted,
+          }
+          const nextStreak = computeHabitStreak(
+            nextWeekly,
+            h.activeDays,
+            currentWeekday,
+            h.streak
+          )
           return {
             ...h,
             completed: nextCompleted,
-            streak: nextCompleted ? h.streak + 1 : Math.max(0, h.streak - 1),
-            weeklyCompletions: {
-              ...(h.weeklyCompletions || {}),
-              [currentWeekday]: nextCompleted,
-            },
+            streak: nextStreak,
+            weeklyCompletions: nextWeekly,
           }
         }
         return h
@@ -187,19 +259,22 @@ export const App: React.FC = () => {
           const currentDayState = h.weeklyCompletions?.[day] ?? false
           const nextDayState = !currentDayState
           const isToday = day === currentWeekday
+          const nextWeekly = {
+            ...(h.weeklyCompletions || {}),
+            [day]: nextDayState,
+          }
+          const nextStreak = computeHabitStreak(
+            nextWeekly,
+            h.activeDays,
+            currentWeekday,
+            h.streak
+          )
 
           return {
             ...h,
-            weeklyCompletions: {
-              ...(h.weeklyCompletions || {}),
-              [day]: nextDayState,
-            },
+            weeklyCompletions: nextWeekly,
             completed: isToday ? nextDayState : h.completed,
-            streak: isToday
-              ? nextDayState
-                ? h.streak + 1
-                : Math.max(0, h.streak - 1)
-              : h.streak,
+            streak: nextStreak,
           }
         }
         return h
@@ -235,15 +310,23 @@ export const App: React.FC = () => {
 
   const handleCompleteAll = () => {
     setHabits((prev) =>
-      prev.map((h) => ({
-        ...h,
-        completed: true,
-        streak: h.completed ? h.streak : h.streak + 1,
-        weeklyCompletions: {
+      prev.map((h) => {
+        const nextWeekly = {
           ...(h.weeklyCompletions || {}),
           [currentWeekday]: true,
-        },
-      }))
+        }
+        return {
+          ...h,
+          completed: true,
+          streak: computeHabitStreak(
+            nextWeekly,
+            h.activeDays,
+            currentWeekday,
+            h.streak + 1
+          ),
+          weeklyCompletions: nextWeekly,
+        }
+      })
     )
     triggerCelebration()
   }
@@ -253,10 +336,15 @@ export const App: React.FC = () => {
       prev.map((h) => ({
         ...h,
         completed: false,
-        streak: h.completed ? Math.max(0, h.streak - 1) : h.streak,
+        streak: 0,
         weeklyCompletions: {
-          ...(h.weeklyCompletions || {}),
-          [currentWeekday]: false,
+          Mon: false,
+          Tue: false,
+          Wed: false,
+          Thu: false,
+          Fri: false,
+          Sat: false,
+          Sun: false,
         },
       }))
     )
@@ -321,7 +409,7 @@ export const App: React.FC = () => {
 
   // Dynamic streak calculation across active scheduled habits
   const currentStreakDays =
-    habits.length > 0 ? Math.max(...habits.map((h) => h.streak), 0) : 7
+    habits.length > 0 ? Math.max(...habits.map((h) => h.streak), 0) : 0
 
   // Dynamic weekly completion percentage across scheduled days
   let totalScheduledSlots = 0
