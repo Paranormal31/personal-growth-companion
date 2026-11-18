@@ -132,11 +132,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               </p>
             </div>
 
-            {/* Sun / Time Illustration Tile */}
+            {/* Signature Cartoon Sun Mascot Tile */}
             <div
-              className={`w-12 h-12 ${greeting.bg} neo-border neo-shadow rounded-2xl flex items-center justify-center p-1 overflow-hidden`}
+              className="w-12 h-12 bg-[#FDE047] neo-border neo-shadow rounded-2xl flex items-center justify-center p-1 overflow-hidden shrink-0"
+              title="Good Vibes Sun"
             >
-              {greeting.icon}
+              <SunMascot size={36} />
             </div>
           </div>
         </header>
