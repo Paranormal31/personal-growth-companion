@@ -1,6 +1,6 @@
 import React from 'react'
-import { Check, RefreshCw, ChevronDown, ChevronUp, GripVertical } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { Check, RefreshCw, ChevronDown, GripVertical } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Habit, Weekday } from '../types/habit'
 import { getHabitIconComponent } from '../constants/icons'
 
@@ -91,61 +91,71 @@ export const HabitItem: React.FC<HabitItemProps> = ({
           </button>
 
           {/* Expand/Collapse Chevron Indicator */}
-          <div className="w-6 h-6 flex items-center justify-center text-black">
-            {isExpanded ? (
-              <ChevronUp className="w-5 h-5 stroke-[2.6]" />
-            ) : (
-              <ChevronDown className="w-5 h-5 stroke-[2.6]" />
-            )}
-          </div>
+          <motion.div
+            animate={{ rotate: isExpanded ? 180 : 0 }}
+            transition={{ duration: 0.18, ease: 'easeInOut' }}
+            className="w-6 h-6 flex items-center justify-center text-black"
+          >
+            <ChevronDown className="w-5 h-5 stroke-[2.6]" />
+          </motion.div>
         </div>
       </div>
 
       {/* Expanded Weekly Checklist Panel (Lavender Background) */}
-      {isExpanded && (
-        <div className="border-t-2 border-black bg-[#DDD6FE] px-3.5 pt-2.5 pb-3">
-          {/* Weekly Header Row */}
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs font-black text-black tracking-tight">
-              This Week
-            </span>
-            <span className="text-xs font-black text-black tracking-tight">
-              {completedDaysCount}/7 days
-            </span>
-          </div>
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0 }}
+            animate={{ height: 'auto' }}
+            exit={{ height: 0 }}
+            transition={{ duration: 0.18, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="border-t-2 border-black bg-[#DDD6FE] px-3.5 pt-2.5 pb-3">
+              {/* Weekly Header Row */}
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-black text-black tracking-tight">
+                  This Week
+                </span>
+                <span className="text-xs font-black text-black tracking-tight">
+                  {completedDaysCount}/7 days
+                </span>
+              </div>
 
-          {/* 7 Days Row: Mon - Sun */}
-          <div className="flex items-center justify-between gap-1">
-            {ALL_WEEKDAYS.map((day) => {
-              const isDayChecked = habit.weeklyCompletions?.[day] ?? false
-              return (
-                <div key={day} className="flex flex-col items-center flex-1">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onToggleDay(day)
-                    }}
-                    className={`w-7 h-7 rounded-lg border-2 border-black flex items-center justify-center neo-pressable cursor-pointer ${
-                      isDayChecked
-                        ? 'bg-[#FDE047] neo-shadow-sm'
-                        : 'bg-white hover:bg-black/5'
-                    }`}
-                    aria-label={`${day}: ${isDayChecked ? 'Completed' : 'Incomplete'}`}
-                  >
-                    {isDayChecked && (
-                      <Check className="w-3.5 h-3.5 text-black stroke-[3.5]" />
-                    )}
-                  </button>
-                  <span className="text-[10px] font-bold text-black/80 mt-1">
-                    {day}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
+              {/* 7 Days Row: Mon - Sun */}
+              <div className="flex items-center justify-between gap-1">
+                {ALL_WEEKDAYS.map((day) => {
+                  const isDayChecked = habit.weeklyCompletions?.[day] ?? false
+                  return (
+                    <div key={day} className="flex flex-col items-center flex-1">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onToggleDay(day)
+                        }}
+                        className={`w-7 h-7 rounded-lg border-2 border-black flex items-center justify-center neo-pressable cursor-pointer ${
+                          isDayChecked
+                            ? 'bg-[#FDE047] neo-shadow-sm'
+                            : 'bg-white hover:bg-black/5'
+                        }`}
+                        aria-label={`${day}: ${isDayChecked ? 'Completed' : 'Incomplete'}`}
+                      >
+                        {isDayChecked && (
+                          <Check className="w-3.5 h-3.5 text-black stroke-[3.5]" />
+                        )}
+                      </button>
+                      <span className="text-[10px] font-bold text-black/80 mt-1">
+                        {day}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
