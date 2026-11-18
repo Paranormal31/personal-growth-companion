@@ -262,8 +262,18 @@ export const App: React.FC = () => {
     )
   }
 
+  const [isViewingAll, setIsViewingAll] = useState(false)
+
   const handleViewAllClick = () => {
-    setToastMessage(`Showing all ${habits.length} habits for today.`)
+    setIsViewingAll((prev) => {
+      const next = !prev
+      setToastMessage(
+        next
+          ? `Showing all ${habits.length} habits.`
+          : `Showing today's ${activeTodayHabits.length} active habits.`
+      )
+      return next
+    })
   }
 
   // Workouts Handlers
@@ -307,9 +317,27 @@ export const App: React.FC = () => {
     h.activeDays.includes(currentWeekday)
   )
 
-  // Stats calculation
-  const currentStreakDays = 7
-  const completionPercentage = 79
+  const displayedHabits = isViewingAll ? habits : activeTodayHabits
+
+  // Dynamic streak calculation across active scheduled habits
+  const currentStreakDays =
+    habits.length > 0 ? Math.max(...habits.map((h) => h.streak), 0) : 7
+
+  // Dynamic weekly completion percentage across scheduled days
+  let totalScheduledSlots = 0
+  let totalCompletedSlots = 0
+  habits.forEach((h) => {
+    h.activeDays.forEach((day) => {
+      totalScheduledSlots++
+      if (h.weeklyCompletions?.[day]) {
+        totalCompletedSlots++
+      }
+    })
+  })
+  const completionPercentage =
+    totalScheduledSlots > 0
+      ? Math.round((totalCompletedSlots / totalScheduledSlots) * 100)
+      : 79
 
   return (
     <PhoneChassis>
@@ -332,7 +360,8 @@ export const App: React.FC = () => {
 
           {/* Middle Scrollable Section: Today's Habits with Drag-and-Drop Reordering */}
           <HabitList
-            habits={activeTodayHabits}
+            habits={displayedHabits}
+            isViewingAll={isViewingAll}
             onReorder={handleReorderHabits}
             onToggle={handleToggleHabit}
             onToggleDay={handleToggleDay}

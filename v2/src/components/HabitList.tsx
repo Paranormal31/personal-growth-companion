@@ -5,6 +5,7 @@ import { HabitItem } from './HabitItem'
 
 interface HabitListProps {
   habits: Habit[]
+  isViewingAll?: boolean
   onReorder: (newOrder: Habit[]) => void
   onToggle: (id: string) => void
   onToggleDay: (habitId: string, day: Weekday) => void
@@ -13,6 +14,7 @@ interface HabitListProps {
 
 export const HabitList: React.FC<HabitListProps> = ({
   habits,
+  isViewingAll = false,
   onReorder,
   onToggle,
   onToggleDay,
@@ -33,7 +35,7 @@ export const HabitList: React.FC<HabitListProps> = ({
       <div className="flex items-center justify-between mb-1.5 px-0.5 shrink-0">
         <div className="flex items-center gap-2">
           <h2 className="text-[17px] font-black text-black tracking-tight">
-            Today&apos;s Habits
+            {isViewingAll ? 'All Habits' : "Today's Habits"}
           </h2>
           <span className="text-[10px] font-black uppercase tracking-wider text-black/40">
             Hold &amp; drag
@@ -43,7 +45,7 @@ export const HabitList: React.FC<HabitListProps> = ({
           onClick={onViewAllClick}
           className="text-xs font-extrabold text-black hover:underline flex items-center gap-1 cursor-pointer"
         >
-          View All &rarr;
+          {isViewingAll ? '← Show Today' : 'View All →'}
         </button>
       </div>
 
@@ -52,7 +54,7 @@ export const HabitList: React.FC<HabitListProps> = ({
         axis="y"
         values={habits}
         onReorder={onReorder}
-        className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-2 py-0.5 pb-2 pr-0.5"
+        className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-2 py-0.5 pb-6 pr-0.5"
       >
         {habits.map((habit) => (
           <Reorder.Item
