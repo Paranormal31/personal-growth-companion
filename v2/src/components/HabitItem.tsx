@@ -1,12 +1,13 @@
 import React from 'react'
 import { Check, RefreshCw, ChevronDown, GripVertical } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, DragControls } from 'framer-motion'
 import { Habit, Weekday } from '../types/habit'
 import { getHabitIconComponent } from '../constants/icons'
 
 interface HabitItemProps {
   habit: Habit
   isExpanded: boolean
+  dragControls?: DragControls
   onToggleExpand: () => void
   onToggleComplete: () => void
   onToggleDay: (day: Weekday) => void
@@ -17,6 +18,7 @@ const ALL_WEEKDAYS: Weekday[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'
 export const HabitItem: React.FC<HabitItemProps> = ({
   habit,
   isExpanded,
+  dragControls,
   onToggleExpand,
   onToggleComplete,
   onToggleDay,
@@ -37,9 +39,19 @@ export const HabitItem: React.FC<HabitItemProps> = ({
       >
         {/* Left: Drag Handle, Icon Tile & Details */}
         <div className="flex items-center gap-2.5">
+          {/* Dotted Grip Handle - Exclusive Drag Activation Area */}
           <div
-            className="cursor-grab active:cursor-grabbing text-black/35 hover:text-black transition-colors py-1 shrink-0"
-            title="Drag to reorder"
+            onPointerDown={(e) => {
+              e.stopPropagation()
+              dragControls?.start(e)
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
+            style={{ touchAction: 'none' }}
+            className="cursor-grab active:cursor-grabbing text-black/40 hover:text-black transition-colors p-1.5 -m-1.5 shrink-0 touch-none select-none"
+            title="Drag handle to reorder"
+            aria-label="Drag handle to reorder"
           >
             <GripVertical className="w-4 h-4 stroke-[2.4]" />
           </div>
