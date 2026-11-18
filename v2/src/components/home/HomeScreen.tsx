@@ -2,7 +2,6 @@ import React from 'react'
 import {
   User,
   Bell,
-  Sun,
   Moon,
   Sunset,
   ArrowRight,
@@ -10,13 +9,13 @@ import {
   Dumbbell,
   Wallet,
   Flame,
-  TrendingDown,
   Sparkles,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Habit, Weekday } from '../../types/habit'
 import { Workout } from '../../types/workout'
 import { Transaction } from '../../types/budget'
+import { SunMascot } from '../SunMascot'
 
 interface HomeScreenProps {
   habits: Habit[]
@@ -43,7 +42,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     if (hour < 12) {
       return {
         text: 'Good Morning.',
-        icon: <Sun className="w-5 h-5 text-black stroke-[2.5]" />,
+        icon: <SunMascot size={36} />,
         bg: 'bg-[#FDE047]',
       }
     }
@@ -135,7 +134,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
             {/* Sun / Time Illustration Tile */}
             <div
-              className={`w-12 h-12 ${greeting.bg} neo-border neo-shadow rounded-2xl flex items-center justify-center`}
+              className={`w-12 h-12 ${greeting.bg} neo-border neo-shadow rounded-2xl flex items-center justify-center p-1 overflow-hidden`}
             >
               {greeting.icon}
             </div>
