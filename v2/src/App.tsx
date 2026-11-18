@@ -457,7 +457,7 @@ export const App: React.FC = () => {
           />
 
           {/* Bottom Fixed Section: Summary Cards & Bottom Nav */}
-          <div className="shrink-0 mt-2">
+          <div className="shrink-0 mt-1.5">
             <SummaryCards
               currentStreakDays={currentStreakDays}
               completionPercentage={completionPercentage}

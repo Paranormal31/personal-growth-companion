@@ -2,7 +2,6 @@ import React from 'react'
 import { Check } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Habit } from '../types/habit'
-import { MascotFlower } from './MascotFlower'
 
 interface ProgressCardProps {
   habits: Habit[]
@@ -13,51 +12,47 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({ habits }) => {
   const completed = habits.filter((h) => h.completed).length
 
   return (
-    <div className="relative w-full bg-[#D4F972] neo-border neo-shadow-lg rounded-[22px] px-4.5 py-4 overflow-hidden shrink-0">
-      <div className="flex items-center justify-between">
-        {/* Left Side: Stats and Mini Checkbox Indicators */}
-        <div className="flex flex-col justify-between z-10">
+    <div className="w-full bg-[#D4F972] neo-border neo-shadow rounded-2xl px-3.5 py-2.5 overflow-hidden shrink-0">
+      <div className="flex items-center justify-between gap-3">
+        {/* Left Side: Progress Label and Completion Counter */}
+        <div className="flex items-center gap-2.5">
           <div>
-            <span className="text-[13px] font-extrabold text-black tracking-tight">
+            <span className="text-[11px] font-black uppercase tracking-wider text-black/70 block leading-tight">
               Today&apos;s Progress
             </span>
             <div className="flex items-baseline gap-1 mt-0.5">
               <motion.span
                 key={completed}
-                initial={{ scale: 0.8, opacity: 0 }}
+                initial={{ scale: 0.85, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="text-4xl font-black text-black tracking-tight"
+                className="text-2xl font-black text-black tracking-tight leading-none"
               >
                 {completed}/{total}
               </motion.span>
             </div>
           </div>
-
-          {/* Row of Mini Habit Indicators */}
-          <div className="flex items-center gap-1.5 mt-3">
-            {habits.map((habit) => (
-              <motion.div
-                key={habit.id}
-                layout
-                initial={false}
-                animate={{
-                  backgroundColor: habit.completed ? '#FDE047' : '#FFFFFF',
-                  scale: habit.completed ? [1, 1.15, 1] : 1,
-                }}
-                transition={{ duration: 0.2 }}
-                className="w-6.5 h-6.5 rounded-md border-2 border-black flex items-center justify-center neo-shadow-sm"
-              >
-                {habit.completed && (
-                  <Check className="w-3.5 h-3.5 text-black stroke-[3.5]" />
-                )}
-              </motion.div>
-            ))}
-          </div>
         </div>
 
-        {/* Right Side: Retro Cartoon Mascot Illustration */}
-        <div className="relative -mr-2 flex items-center justify-center">
-          <MascotFlower completed={completed} total={total} />
+        {/* Right Side: Individual Completion Indicator Tiles */}
+        <div className="flex items-center gap-1.5 flex-wrap justify-end">
+          {habits.map((habit) => (
+            <motion.div
+              key={habit.id}
+              layout
+              initial={false}
+              animate={{
+                backgroundColor: habit.completed ? '#FDE047' : '#FFFFFF',
+                scale: habit.completed ? [1, 1.15, 1] : 1,
+              }}
+              transition={{ duration: 0.18 }}
+              className="w-6 h-6 rounded-md border-2 border-black flex items-center justify-center neo-shadow-sm shrink-0"
+              title={`${habit.name}: ${habit.completed ? 'Completed' : 'Pending'}`}
+            >
+              {habit.completed && (
+                <Check className="w-3.5 h-3.5 text-black stroke-[3.5]" />
+              )}
+            </motion.div>
+          ))}
         </div>
       </div>
     </div>

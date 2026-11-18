@@ -35,7 +35,7 @@ export const HabitItem: React.FC<HabitItemProps> = ({
       {/* Habit Card Header Row */}
       <div
         onClick={onToggleExpand}
-        className="px-3 py-3 flex items-center justify-between cursor-pointer neo-pressable"
+        className="px-3 py-2.5 flex items-center justify-between cursor-pointer neo-pressable"
       >
         {/* Left: Drag Handle, Icon Tile & Details */}
         <div className="flex items-center gap-2.5">
@@ -57,14 +57,14 @@ export const HabitItem: React.FC<HabitItemProps> = ({
           </div>
 
           <div
-            className="w-11 h-11 rounded-xl border-2 border-black neo-shadow-sm flex items-center justify-center shrink-0"
+            className="w-10 h-10 rounded-xl border-2 border-black neo-shadow-sm flex items-center justify-center shrink-0"
             style={{ backgroundColor: habit.accentColor }}
           >
             <IconComponent className="w-5 h-5 text-black stroke-[2.4]" />
           </div>
 
           <div className="flex flex-col">
-            <span className="text-[16px] font-black text-black tracking-tight leading-tight">
+            <span className="text-[15.5px] font-black text-black tracking-tight leading-tight">
               {habit.name}
             </span>
             <div className="flex items-center gap-1.5 text-xs font-bold text-black/75 mt-0.5">
@@ -123,7 +123,7 @@ export const HabitItem: React.FC<HabitItemProps> = ({
             transition={{ duration: 0.18, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="border-t-2 border-black bg-[#DDD6FE] px-3.5 pt-2.5 pb-3">
+            <div className="border-t-2 border-black bg-[#DDD6FE] px-3.5 pt-2 pb-2.5">
               {/* Weekly Header Row */}
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs font-black text-black tracking-tight">

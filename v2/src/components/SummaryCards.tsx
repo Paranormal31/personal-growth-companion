@@ -11,17 +11,17 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
   completionPercentage = 86,
 }) => {
   return (
-    <div className="grid grid-cols-2 gap-2.5 w-full mt-3 shrink-0">
+    <div className="grid grid-cols-2 gap-2 w-full mt-2 shrink-0">
       {/* Current Streak Card */}
       <motion.div
         whileHover={{ y: -2 }}
-        className="bg-[#FDE047] neo-border neo-shadow rounded-2xl px-3.5 py-3 flex items-center justify-between select-none"
+        className="bg-[#FDE047] neo-border neo-shadow rounded-2xl px-3 py-2 flex items-center justify-between select-none"
       >
         <div>
-          <span className="text-[12px] font-extrabold text-black tracking-tight block">
+          <span className="text-[11px] font-extrabold text-black tracking-tight block">
             Current Streak
           </span>
-          <span className="text-xl font-black text-black tracking-tight block mt-0.5 leading-none">
+          <span className="text-lg font-black text-black tracking-tight block mt-0.5 leading-none">
             {currentStreakDays} days
           </span>
         </div>
@@ -29,8 +29,8 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
         {/* Retro Cartoon Flame Graphic */}
         <div className="relative shrink-0 flex items-center justify-center">
           <svg
-            width="30"
-            height="34"
+            width="26"
+            height="30"
             viewBox="0 0 32 36"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -56,23 +56,23 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
       {/* This Week Card */}
       <motion.div
         whileHover={{ y: -2 }}
-        className="bg-[#DDD6FE] neo-border neo-shadow rounded-2xl px-3.5 py-3 flex items-center justify-between select-none"
+        className="bg-[#DDD6FE] neo-border neo-shadow rounded-2xl px-3 py-2 flex items-center justify-between select-none"
       >
         <div>
-          <span className="text-[12px] font-extrabold text-black tracking-tight block">
+          <span className="text-[11px] font-extrabold text-black tracking-tight block">
             This Week
           </span>
-          <span className="text-xl font-black text-black tracking-tight block mt-0.5 leading-none">
+          <span className="text-lg font-black text-black tracking-tight block mt-0.5 leading-none">
             {completionPercentage}%
           </span>
         </div>
 
         {/* Mini 4-Bar Chart Graphic */}
-        <div className="flex items-end gap-1.5 h-6 shrink-0 pr-1">
+        <div className="flex items-end gap-1 h-5 shrink-0 pr-0.5">
           <div className="w-1.5 h-2 bg-black rounded-full" />
-          <div className="w-1.5 h-3.5 bg-black rounded-full" />
+          <div className="w-1.5 h-3 bg-black rounded-full" />
+          <div className="w-1.5 h-4 bg-black rounded-full" />
           <div className="w-1.5 h-5 bg-black rounded-full" />
-          <div className="w-1.5 h-6.5 bg-black rounded-full" />
         </div>
       </motion.div>
     </div>
