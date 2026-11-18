@@ -85,30 +85,35 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs select-none">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/50 backdrop-blur-xs select-none">
           <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 12 }}
+            initial={{ opacity: 0, scale: 0.95, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: 12 }}
-            transition={{ type: 'spring', damping: 26, stiffness: 340 }}
-            className="w-full max-w-[400px] bg-[#FFFDF5] neo-border-thick neo-shadow-phone rounded-[28px] p-4.5 sm:p-5 relative max-h-[92vh] overflow-y-auto no-scrollbar"
+            exit={{ opacity: 0, scale: 0.95, y: 12 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+            className="w-full max-w-[355px] bg-[#FFFDF5] neo-border-thick neo-shadow-lg rounded-[26px] p-4 relative max-h-[90vh] overflow-y-auto no-scrollbar"
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-2.5 border-b-2 border-black mb-3">
-              <h2 className="text-[20px] font-black text-black tracking-tight">
-                Add New Habit
-              </h2>
+            <div className="flex items-center justify-between pb-2 border-b-2 border-black mb-2.5">
+              <div>
+                <h2 className="text-[18px] font-black text-black tracking-tight leading-tight">
+                  Add New Habit
+                </h2>
+                <p className="text-[11px] font-bold text-black/60 mt-0.5">
+                  Set up a routine to build consistency.
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="w-8 h-8 rounded-xl bg-white neo-border flex items-center justify-center neo-pressable cursor-pointer neo-shadow-sm"
+                className="w-7 h-7 rounded-lg bg-white neo-border flex items-center justify-center neo-pressable cursor-pointer neo-shadow-sm"
                 aria-label="Close dialog"
               >
                 <X className="w-4 h-4 text-black stroke-[3]" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            <form onSubmit={handleSubmit} className="space-y-2.5">
               {/* 1. HABIT NAME */}
               <div>
                 <label className="text-[11px] font-black uppercase tracking-wider text-black block mb-1">
@@ -124,14 +129,14 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
                     setName(e.target.value)
                     if (hasError) setHasError(false)
                   }}
-                  className={`w-full px-3.5 py-2.5 bg-white neo-border rounded-xl font-bold text-sm text-black placeholder:text-black/40 focus:outline-none transition-colors ${
+                  className={`w-full px-3 py-2 bg-white neo-border rounded-xl font-bold text-xs text-black placeholder:text-black/40 focus:outline-none transition-colors ${
                     hasError
                       ? 'border-[#FF70A6] ring-2 ring-[#FF70A6] bg-pink-50/40'
                       : 'focus:ring-2 focus:ring-[#FDE047]'
                   }`}
                 />
                 {hasError && (
-                  <span className="text-[11px] font-black text-[#E11D48] mt-1 block">
+                  <span className="text-[10.5px] font-black text-[#E11D48] mt-0.5 block">
                     Please enter a habit name to continue.
                   </span>
                 )}
@@ -139,12 +144,12 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
 
               {/* 2. SELECT ICON (Full Width with 6-Column Grid) */}
               <div>
-                <label className="text-sm font-black text-black block mb-1.5">
+                <label className="text-xs font-black text-black block mb-1">
                   Select Icon
                 </label>
-                <div className="bg-white neo-border rounded-2xl p-2.5 flex flex-col">
+                <div className="bg-white neo-border rounded-xl p-2 flex flex-col">
                   {/* Category Tab Bar (4 distinct categories) */}
-                  <div className="flex items-center justify-between gap-1 mb-2.5 bg-[#F4F0E6] rounded-xl border border-black/20 p-1">
+                  <div className="flex items-center justify-between gap-1 mb-2 bg-[#F4F0E6] rounded-lg border border-black/20 p-0.5">
                     {ICON_CATEGORIES.map((cat) => {
                       const isActive = cat.id === activeCategoryId
                       return (
@@ -152,9 +157,9 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
                           key={cat.id}
                           type="button"
                           onClick={() => setActiveCategoryId(cat.id)}
-                          className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-black cursor-pointer neo-pressable transition-all text-center ${
+                          className={`flex-1 py-1 px-1 rounded-md text-[10.5px] font-black cursor-pointer neo-pressable transition-all text-center ${
                             isActive
-                              ? 'bg-[#FDE047] border-[1.8px] border-black neo-shadow-sm text-black'
+                              ? 'bg-[#FDE047] border-[1.5px] border-black neo-shadow-sm text-black'
                               : 'text-black/70 hover:text-black'
                           }`}
                         >
@@ -165,7 +170,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
                   </div>
 
                   {/* 6-Column Icon Grid (2 rows of 6 = 12 icons) */}
-                  <div className="grid grid-cols-6 gap-2 justify-items-center">
+                  <div className="grid grid-cols-6 gap-1.5 justify-items-center">
                     {activeCategory.icons.map((item: IconDefinition) => {
                       const IconComponent = item.component
                       const isSelected = selectedIconId === item.id
@@ -176,9 +181,9 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
                           type="button"
                           whileTap={{ scale: 0.92 }}
                           onClick={() => setSelectedIconId(item.id)}
-                          className={`w-11 h-11 rounded-xl border-[1.8px] border-black flex items-center justify-center cursor-pointer neo-pressable relative ${
+                          className={`w-9 h-9 rounded-lg border-[1.8px] border-black flex items-center justify-center cursor-pointer neo-pressable relative ${
                             isSelected
-                              ? 'border-2 border-black neo-shadow-sm scale-105'
+                              ? 'border-2 border-black neo-shadow-sm'
                               : 'bg-white hover:bg-black/5'
                           }`}
                           style={{
@@ -186,12 +191,12 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
                           }}
                           title={item.label}
                         >
-                          <IconComponent className="w-5 h-5 text-black stroke-[2.2]" />
+                          <IconComponent className="w-4 h-4 text-black stroke-[2.2]" />
 
                           {/* Checkmark corner badge when selected */}
                           {isSelected && (
-                            <div className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-white border-[1.8px] border-black rounded-full flex items-center justify-center shadow-xs z-10">
-                              <Check className="w-2.5 h-2.5 text-black stroke-[3.5]" />
+                            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-white border-[1.5px] border-black rounded-full flex items-center justify-center shadow-xs z-10">
+                              <Check className="w-2 h-2 text-black stroke-[3.5]" />
                             </div>
                           )}
                         </motion.button>
@@ -203,10 +208,10 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
 
               {/* 3. COLOR (Full Width, 8 Pastel Colors, 4 per row) */}
               <div>
-                <label className="text-sm font-black text-black block mb-1.5">
+                <label className="text-xs font-black text-black block mb-1">
                   Color
                 </label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-1.5">
                   {COLOR_SWATCHES.map((color) => {
                     const isSelected = selectedColor === color
                     return (
@@ -215,9 +220,9 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
                         type="button"
                         whileTap={{ scale: 0.94 }}
                         onClick={() => setSelectedColor(color)}
-                        className={`h-11 rounded-xl border-2 border-black cursor-pointer neo-pressable relative ${
+                        className={`h-8 rounded-lg border-2 border-black cursor-pointer neo-pressable relative ${
                           isSelected
-                            ? 'scale-105 neo-shadow-sm'
+                            ? 'neo-shadow-sm ring-2 ring-black'
                             : 'opacity-90 hover:opacity-100'
                         }`}
                         style={{ backgroundColor: color }}
@@ -225,8 +230,8 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
                       >
                         {/* Checkmark corner badge when selected */}
                         {isSelected && (
-                          <div className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-white border-[1.8px] border-black rounded-full flex items-center justify-center shadow-xs z-10">
-                            <Check className="w-2.5 h-2.5 text-black stroke-[3.5]" />
+                          <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-white border-[1.5px] border-black rounded-full flex items-center justify-center shadow-xs z-10">
+                            <Check className="w-2 h-2 text-black stroke-[3.5]" />
                           </div>
                         )}
                       </motion.button>
@@ -248,7 +253,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
                         key={day}
                         type="button"
                         onClick={() => toggleDay(day)}
-                        className={`flex-1 py-1.5 rounded-xl text-[11px] font-black neo-pressable cursor-pointer border-[1.8px] border-black transition-all ${
+                        className={`flex-1 py-1 rounded-lg text-[10.5px] font-black neo-pressable cursor-pointer border-[1.8px] border-black transition-all ${
                           isActive
                             ? 'bg-[#FDE047] neo-shadow-sm text-black'
                             : 'bg-white text-black/60 hover:bg-black/5'
@@ -262,19 +267,19 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
               </div>
 
               {/* 5. BOTTOM ACTIONS: CANCEL & SAVE */}
-              <div className="pt-2 flex gap-2.5">
+              <div className="pt-1 flex gap-2">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 py-2.5 bg-white neo-border neo-shadow-sm rounded-2xl font-black text-xs text-black neo-pressable cursor-pointer"
+                  className="flex-1 py-2 bg-white neo-border neo-shadow-sm rounded-xl font-black text-xs text-black neo-pressable cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-[#FDE047] neo-border neo-shadow rounded-2xl font-black text-xs text-black neo-pressable flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="flex-1 py-2 bg-[#FDE047] neo-border neo-shadow rounded-xl font-black text-xs text-black neo-pressable flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <Check className="w-4 h-4 stroke-[3.5]" />
+                  <Check className="w-3.5 h-3.5 stroke-[3.5]" />
                   Save Habit
                 </button>
               </div>
