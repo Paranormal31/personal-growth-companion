@@ -10,6 +10,7 @@ interface HabitListProps {
   onToggle: (id: string) => void
   onToggleDay: (habitId: string, day: Weekday) => void
   onViewAllClick: () => void
+  onEditHabit?: (habit: Habit) => void
 }
 
 interface ReorderableHabitRowProps {
@@ -18,6 +19,7 @@ interface ReorderableHabitRowProps {
   onToggleExpand: () => void
   onToggleComplete: () => void
   onToggleDay: (day: Weekday) => void
+  onEdit?: () => void
 }
 
 const ReorderableHabitRow: React.FC<ReorderableHabitRowProps> = ({
@@ -26,6 +28,7 @@ const ReorderableHabitRow: React.FC<ReorderableHabitRowProps> = ({
   onToggleExpand,
   onToggleComplete,
   onToggleDay,
+  onEdit,
 }) => {
   const dragControls = useDragControls()
 
@@ -48,6 +51,7 @@ const ReorderableHabitRow: React.FC<ReorderableHabitRowProps> = ({
         onToggleExpand={onToggleExpand}
         onToggleComplete={onToggleComplete}
         onToggleDay={onToggleDay}
+        onEdit={onEdit}
       />
     </Reorder.Item>
   )
@@ -60,6 +64,7 @@ export const HabitList: React.FC<HabitListProps> = ({
   onToggle,
   onToggleDay,
   onViewAllClick,
+  onEditHabit,
 }) => {
   // Default first habit expanded as shown in the reference image
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(
@@ -105,6 +110,7 @@ export const HabitList: React.FC<HabitListProps> = ({
             onToggleExpand={() => handleToggleExpand(habit.id)}
             onToggleComplete={() => onToggle(habit.id)}
             onToggleDay={(day) => onToggleDay(habit.id, day)}
+            onEdit={() => onEditHabit?.(habit)}
           />
         ))}
       </Reorder.Group>

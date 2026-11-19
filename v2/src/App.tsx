@@ -88,6 +88,7 @@ export const computeHabitStreak = (
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavTab>('habit')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
 
   // Current weekday
@@ -290,6 +291,45 @@ export const App: React.FC = () => {
     setToastMessage(`Added "${newHabit.name}" to your habits!`)
   }
 
+  const handleOpenEditHabit = (habit: Habit) => {
+    setEditingHabit(habit)
+    setIsAddModalOpen(true)
+  }
+
+  const handleUpdateHabit = (updatedHabit: Habit) => {
+    setHabits((prev) =>
+      prev.map((h) => {
+        if (h.id === updatedHabit.id) {
+          const weekly = h.weeklyCompletions || {}
+          const newStreak = computeHabitStreak(
+            weekly,
+            updatedHabit.activeDays,
+            currentWeekday,
+            h.streak
+          )
+          return {
+            ...h,
+            name: updatedHabit.name,
+            iconName: updatedHabit.iconName,
+            accentColor: updatedHabit.accentColor,
+            activeDays: updatedHabit.activeDays,
+            category: updatedHabit.category,
+            streak: newStreak,
+          }
+        }
+        return h
+      })
+    )
+    setToastMessage(`Updated "${updatedHabit.name}"!`)
+    setEditingHabit(null)
+    setIsAddModalOpen(false)
+  }
+
+  const handleCloseAddEditModal = () => {
+    setIsAddModalOpen(false)
+    setEditingHabit(null)
+  }
+
   const handleResetDemo = () => {
     setHabits(INITIAL_HABITS)
   }
@@ -422,7 +462,10 @@ export const App: React.FC = () => {
           {/* Top Fixed Section */}
           <div className="shrink-0">
             <Header
-              onOpenAddHabit={() => setIsAddModalOpen(true)}
+              onOpenAddHabit={() => {
+                setEditingHabit(null)
+                setIsAddModalOpen(true)
+              }}
               onResetDemo={handleResetDemo}
               onCompleteAll={handleCompleteAll}
               onClearAll={handleClearAll}
@@ -439,6 +482,7 @@ export const App: React.FC = () => {
             onToggle={handleToggleHabit}
             onToggleDay={handleToggleDay}
             onViewAllClick={handleViewAllClick}
+            onEditHabit={handleOpenEditHabit}
           />
 
           {/* Bottom Fixed Section: Summary Cards & Bottom Nav */}
@@ -523,11 +567,13 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Add New Habit Modal (Preserved & Enhanced) */}
+      {/* Add / Edit Habit Modal */}
       <AddHabitModal
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        onClose={handleCloseAddEditModal}
         onAddHabit={handleAddHabit}
+        editingHabit={editingHabit}
+        onUpdateHabit={handleUpdateHabit}
       />
     </PhoneChassis>
   )

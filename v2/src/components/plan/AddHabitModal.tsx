@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { X, Check } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Habit, Weekday } from '../../types/habit'
@@ -12,6 +12,8 @@ interface AddHabitModalProps {
   isOpen: boolean
   onClose: () => void
   onAddHabit: (habit: Omit<Habit, 'id'>) => void
+  editingHabit?: Habit | null
+  onUpdateHabit?: (habit: Habit) => void
 }
 
 const ALL_WEEKDAYS: Weekday[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -20,6 +22,8 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
   isOpen,
   onClose,
   onAddHabit,
+  editingHabit,
+  onUpdateHabit,
 }) => {
   const [name, setName] = useState('')
   const [activeCategoryId, setActiveCategoryId] = useState<
@@ -37,6 +41,41 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
 
   // Validation feedback state
   const [hasError, setHasError] = useState(false)
+
+  // Prepopulate form when editingHabit changes or modal opens
+  useEffect(() => {
+    if (editingHabit && isOpen) {
+      setName(editingHabit.name)
+      setSelectedIconId(editingHabit.iconName)
+      setSelectedColor(editingHabit.accentColor)
+      setSelectedDays(
+        editingHabit.activeDays && editingHabit.activeDays.length > 0
+          ? editingHabit.activeDays
+          : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+      )
+
+      // Match category containing the habit's icon
+      const matchingCat = ICON_CATEGORIES.find((cat) =>
+        cat.icons.some((icon) => icon.id === editingHabit.iconName)
+      )
+      if (matchingCat) {
+        setActiveCategoryId(matchingCat.id)
+      } else if (
+        editingHabit.category &&
+        ['common', 'productivity', 'wellness', 'leisure'].includes(
+          editingHabit.category
+        )
+      ) {
+        setActiveCategoryId(editingHabit.category as any)
+      }
+    } else if (!editingHabit && isOpen) {
+      setName('')
+      setSelectedIconId('dumbbell')
+      setSelectedColor('#FF70A6')
+      setSelectedDays(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+      setActiveCategoryId('common')
+    }
+  }, [editingHabit, isOpen])
 
   const activeCategory =
     ICON_CATEGORIES.find((c) => c.id === activeCategoryId) || ICON_CATEGORIES[0]
@@ -62,6 +101,19 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
 
     if (selectedDays.length === 0) {
       setSelectedDays(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'])
+    }
+
+    if (editingHabit && onUpdateHabit) {
+      onUpdateHabit({
+        ...editingHabit,
+        name: name.trim(),
+        category: activeCategoryId,
+        accentColor: selectedColor,
+        iconName: selectedIconId,
+        activeDays: selectedDays,
+      })
+      onClose()
+      return
     }
 
     onAddHabit({
@@ -97,10 +149,12 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
             <div className="flex items-center justify-between pb-2 border-b-2 border-black mb-2.5">
               <div>
                 <h2 className="text-[18px] font-black text-black tracking-tight leading-tight">
-                  Add New Habit
+                  {editingHabit ? 'Edit Habit' : 'Add New Habit'}
                 </h2>
                 <p className="text-[11px] font-bold text-black/60 mt-0.5">
-                  Set up a routine to build consistency.
+                  {editingHabit
+                    ? 'Update your routine and preferences.'
+                    : 'Set up a routine to build consistency.'}
                 </p>
               </div>
               <button
@@ -280,7 +334,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
                   className="flex-1 py-2 bg-[#FDE047] neo-border neo-shadow rounded-xl font-black text-xs text-black neo-pressable flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Check className="w-3.5 h-3.5 stroke-[3.5]" />
-                  Save Habit
+                  {editingHabit ? 'Save Changes' : 'Save Habit'}
                 </button>
               </div>
             </form>

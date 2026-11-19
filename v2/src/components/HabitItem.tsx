@@ -1,5 +1,5 @@
 import React from 'react'
-import { Check, RefreshCw, ChevronDown, GripVertical } from 'lucide-react'
+import { Check, RefreshCw, ChevronDown, GripVertical, Pencil } from 'lucide-react'
 import { motion, AnimatePresence, DragControls } from 'framer-motion'
 import { Habit, Weekday } from '../types/habit'
 import { getHabitIconComponent } from '../constants/icons'
@@ -11,6 +11,7 @@ interface HabitItemProps {
   onToggleExpand: () => void
   onToggleComplete: () => void
   onToggleDay: (day: Weekday) => void
+  onEdit?: () => void
 }
 
 const ALL_WEEKDAYS: Weekday[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -22,6 +23,7 @@ export const HabitItem: React.FC<HabitItemProps> = ({
   onToggleExpand,
   onToggleComplete,
   onToggleDay,
+  onEdit,
 }) => {
   const IconComponent = getHabitIconComponent(habit.iconName)
 
@@ -74,8 +76,8 @@ export const HabitItem: React.FC<HabitItemProps> = ({
           </div>
         </div>
 
-        {/* Right: Checkbox & Expand Chevron */}
-        <div className="flex items-center gap-2">
+        {/* Right: Checkbox, Discreet Edit (only when expanded) & Expand Chevron */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Completion Checkbox */}
           <button
             type="button"
@@ -101,6 +103,26 @@ export const HabitItem: React.FC<HabitItemProps> = ({
               <Check className="w-4.5 h-4.5 text-black stroke-[3.5]" />
             </motion.div>
           </button>
+
+          {/* Discreet Edit Button (Shown ONLY when habit is expanded) */}
+          {isExpanded && (
+            <motion.button
+              type="button"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              onClick={(e) => {
+                e.stopPropagation()
+                onEdit?.()
+              }}
+              className="w-7 h-7 rounded-lg border-2 border-black bg-white flex items-center justify-center neo-pressable neo-shadow-sm cursor-pointer hover:bg-[#FDE047] text-black transition-colors shrink-0"
+              title={`Edit ${habit.name}`}
+              aria-label={`Edit ${habit.name}`}
+            >
+              <Pencil className="w-3.5 h-3.5 stroke-[2.4]" />
+            </motion.button>
+          )}
 
           {/* Expand/Collapse Chevron Indicator */}
           <motion.div
