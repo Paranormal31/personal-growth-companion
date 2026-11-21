@@ -37,10 +37,10 @@ export const HabitItem: React.FC<HabitItemProps> = ({
       {/* Habit Card Header Row */}
       <div
         onClick={onToggleExpand}
-        className="px-3 py-2.5 flex items-center justify-between cursor-pointer neo-pressable"
+        className="pl-3 pr-3.5 py-2.5 flex items-center justify-between cursor-pointer neo-pressable"
       >
         {/* Left: Drag Handle, Icon Tile & Details */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
           {/* Dotted Grip Handle - Exclusive Drag Activation Area */}
           <div
             onPointerDown={(e) => {
@@ -62,22 +62,22 @@ export const HabitItem: React.FC<HabitItemProps> = ({
             className="w-10 h-10 rounded-xl border-2 border-black neo-shadow-sm flex items-center justify-center shrink-0"
             style={{ backgroundColor: habit.accentColor }}
           >
-            <IconComponent className="w-5 h-5 text-black stroke-[2.4]" />
+            <IconComponent className="w-5 h-5 text-black stroke-[2.4] overflow-visible" />
           </div>
 
-          <div className="flex flex-col">
-            <span className="text-[15.5px] font-black text-black tracking-tight leading-tight">
+          <div className="flex flex-col min-w-0">
+            <span className="text-[15.5px] font-black text-black tracking-tight leading-tight truncate">
               {habit.name}
             </span>
-            <div className="flex items-center gap-1.5 text-xs font-bold text-black/75 mt-0.5">
-              <RefreshCw className="w-3.5 h-3.5 text-black stroke-[2.2]" />
+            <div className="flex items-center gap-1.5 text-xs font-bold text-black/75 mt-0.5 whitespace-nowrap">
+              <RefreshCw className="w-3.5 h-3.5 text-black stroke-[2.2] shrink-0" />
               <span>{habit.streak} day streak</span>
             </div>
           </div>
         </div>
 
         {/* Right: Checkbox, Discreet Edit (only when expanded) & Expand Chevron */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Completion Checkbox */}
           <button
             type="button"
@@ -100,7 +100,7 @@ export const HabitItem: React.FC<HabitItemProps> = ({
               }}
               transition={{ type: 'spring', stiffness: 500, damping: 25 }}
             >
-              <Check className="w-4.5 h-4.5 text-black stroke-[3.5]" />
+              <Check className="w-4.5 h-4.5 text-black stroke-[3.5] overflow-visible" />
             </motion.div>
           </button>
 
@@ -120,7 +120,7 @@ export const HabitItem: React.FC<HabitItemProps> = ({
               title={`Edit ${habit.name}`}
               aria-label={`Edit ${habit.name}`}
             >
-              <Pencil className="w-3.5 h-3.5 stroke-[2.4]" />
+              <Pencil className="w-3.5 h-3.5 stroke-[2.4] overflow-visible" />
             </motion.button>
           )}
 
@@ -128,9 +128,9 @@ export const HabitItem: React.FC<HabitItemProps> = ({
           <motion.div
             animate={{ rotate: isExpanded ? 180 : 0 }}
             transition={{ duration: 0.18, ease: 'easeInOut' }}
-            className="w-6 h-6 flex items-center justify-center text-black"
+            className="w-6 h-6 flex items-center justify-center text-black shrink-0"
           >
-            <ChevronDown className="w-5 h-5 stroke-[2.6]" />
+            <ChevronDown className="w-5 h-5 stroke-[2.6] overflow-visible" />
           </motion.div>
         </div>
       </div>
@@ -176,7 +176,7 @@ export const HabitItem: React.FC<HabitItemProps> = ({
                         aria-label={`${day}: ${isDayChecked ? 'Completed' : 'Incomplete'}`}
                       >
                         {isDayChecked && (
-                          <Check className="w-3.5 h-3.5 text-black stroke-[3.5]" />
+                          <Check className="w-3.5 h-3.5 text-black stroke-[3.5] overflow-visible" />
                         )}
                       </button>
                       <span className="text-[10px] font-bold text-black/80 mt-1">

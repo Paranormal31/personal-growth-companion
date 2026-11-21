@@ -96,9 +96,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       {/* Top Fixed Section: Header & Daily Overview */}
       <div className="shrink-0">
         {/* Header */}
-        <header className="relative w-full pt-0.5 pb-2 shrink-0">
+        <header className="relative w-full pt-0.5 pb-2 pr-1 shrink-0">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="min-w-0 flex-1 mr-2">
               <h1 className="text-[26px] sm:text-[30px] font-black text-black leading-none tracking-tight">
                 {greeting.text}
               </h1>

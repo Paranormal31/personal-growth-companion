@@ -100,7 +100,7 @@ export const HabitList: React.FC<HabitListProps> = ({
         axis="y"
         values={habits}
         onReorder={onReorder}
-        className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-2 py-0.5 pb-8 pr-0.5"
+        className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-2 py-0.5 pb-8 pr-1.5 pl-0.5"
       >
         {habits.map((habit) => (
           <ReorderableHabitRow

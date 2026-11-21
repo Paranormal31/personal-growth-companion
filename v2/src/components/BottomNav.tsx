@@ -52,7 +52,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 
   return (
     <nav className="w-full mt-2 select-none shrink-0" aria-label="Bottom Navigation">
-      <div className="w-full bg-white neo-border neo-shadow rounded-2xl px-2 py-1.5 flex items-center justify-between">
+      <div className="w-full bg-white neo-border neo-shadow rounded-2xl pl-2 pr-2.5 py-1.5 flex items-center justify-between">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id
 
@@ -61,7 +61,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id, tab.label)}
-                className="w-11 h-10 bg-[#FDE047] neo-border rounded-xl flex items-center justify-center neo-pressable neo-shadow-sm cursor-pointer"
+                className="w-11 h-10 bg-[#FDE047] neo-border rounded-xl flex items-center justify-center neo-pressable neo-shadow-sm cursor-pointer shrink-0"
                 aria-label={`${tab.label} Screen (Active)`}
               >
                 {tab.icon}
@@ -73,7 +73,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             <button
               key={tab.id}
               onClick={() => handleTabClick(tab.id, tab.label)}
-              className="w-10 h-10 flex items-center justify-center text-black hover:opacity-75 neo-pressable cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center text-black hover:opacity-75 neo-pressable cursor-pointer shrink-0"
               aria-label={`${tab.label} Screen`}
             >
               {tab.icon}

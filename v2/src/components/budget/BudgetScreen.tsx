@@ -127,9 +127,9 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
       {/* Top Fixed Section: Header, Monthly Overview & Financial Summary */}
       <div className="shrink-0">
         {/* Header */}
-        <header className="relative w-full pt-0.5 pb-2 shrink-0">
+        <header className="relative w-full pt-0.5 pb-2 pr-1 shrink-0">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="min-w-0 flex-1 mr-2">
               <h1 className="text-[26px] sm:text-[30px] font-black text-black leading-none tracking-tight">
                 Budget Tracker<span className="text-[#FDE047]">.</span>
               </h1>
@@ -143,11 +143,11 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsAddModalOpen(true)}
-              className="w-11 h-11 bg-[#FDE047] neo-border neo-shadow rounded-xl flex items-center justify-center select-none cursor-pointer"
+              className="w-11 h-11 bg-[#FDE047] neo-border neo-shadow rounded-xl flex items-center justify-center select-none cursor-pointer shrink-0"
               title="Add Transaction"
               aria-label="Add Transaction"
             >
-              <Plus className="w-6 h-6 text-black stroke-[3]" />
+              <Plus className="w-6 h-6 text-black stroke-[3] overflow-visible" />
             </motion.button>
           </div>
         </header>
