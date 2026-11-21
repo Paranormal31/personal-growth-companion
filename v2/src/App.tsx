@@ -330,6 +330,14 @@ export const App: React.FC = () => {
     setEditingHabit(null)
   }
 
+  const handleDeleteHabit = (id: string) => {
+    const habitToDelete = habits.find((h) => h.id === id)
+    setHabits((prev) => prev.filter((h) => h.id !== id))
+    setToastMessage(`Deleted "${habitToDelete?.name || 'habit'}"!`)
+    setEditingHabit(null)
+    setIsAddModalOpen(false)
+  }
+
   const handleResetDemo = () => {
     setHabits(INITIAL_HABITS)
   }
@@ -574,6 +582,7 @@ export const App: React.FC = () => {
         onAddHabit={handleAddHabit}
         editingHabit={editingHabit}
         onUpdateHabit={handleUpdateHabit}
+        onDeleteHabit={handleDeleteHabit}
       />
     </PhoneChassis>
   )

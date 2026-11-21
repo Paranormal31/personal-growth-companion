@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { X, Check } from 'lucide-react'
+import { X, Check, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Habit, Weekday } from '../../types/habit'
 import {
@@ -14,6 +14,7 @@ interface AddHabitModalProps {
   onAddHabit: (habit: Omit<Habit, 'id'>) => void
   editingHabit?: Habit | null
   onUpdateHabit?: (habit: Habit) => void
+  onDeleteHabit?: (habitId: string) => void
 }
 
 const ALL_WEEKDAYS: Weekday[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -24,6 +25,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
   onAddHabit,
   editingHabit,
   onUpdateHabit,
+  onDeleteHabit,
 }) => {
   const [name, setName] = useState('')
   const [activeCategoryId, setActiveCategoryId] = useState<
@@ -320,12 +322,27 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({
                 </div>
               </div>
 
-              {/* 5. BOTTOM ACTIONS: CANCEL & SAVE */}
-              <div className="pt-1 flex gap-2">
+              {/* 5. BOTTOM ACTIONS: CANCEL & SAVE (plus DELETE when editing) */}
+              <div className="pt-1 flex items-center gap-2">
+                {editingHabit && onDeleteHabit && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onDeleteHabit(editingHabit.id)
+                      onClose()
+                    }}
+                    className="px-3 py-2 bg-[#FF85A2] neo-border neo-shadow-sm rounded-xl font-black text-xs text-black neo-pressable cursor-pointer flex items-center justify-center gap-1.5 hover:bg-[#FF70A6] transition-colors shrink-0"
+                    title="Delete Habit"
+                    aria-label="Delete Habit"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 stroke-[2.4]" />
+                    <span>Delete</span>
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 py-2 bg-white neo-border neo-shadow-sm rounded-xl font-black text-xs text-black neo-pressable cursor-pointer"
+                  className="flex-1 py-2 bg-white neo-border neo-shadow-sm rounded-xl font-black text-xs text-black neo-pressable cursor-pointer text-center"
                 >
                   Cancel
                 </button>
