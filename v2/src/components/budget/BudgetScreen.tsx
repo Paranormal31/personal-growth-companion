@@ -18,7 +18,6 @@ import {
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Transaction, BudgetCategory } from '../../types/budget'
-import { BudgetMascot } from './BudgetMascot'
 import { CategoryDonutChart } from './CategoryDonutChart'
 import { AddTransactionModal } from './AddTransactionModal'
 import { TransactionDetailModal } from './TransactionDetailModal'
@@ -152,15 +151,20 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
           </div>
         </header>
 
-        {/* Monthly Overview Card */}
-        <div className="w-full bg-[#DDD6FE] neo-border neo-shadow rounded-3xl p-3 mb-2 flex items-center justify-between">
-          <div className="flex-1 pr-2">
-            <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-black/70 mb-0.5">
+        {/* Monthly Overview Card - Compact without Mascot */}
+        <div className="w-full bg-[#DDD6FE] neo-border neo-shadow rounded-2xl pl-3.5 pr-4 py-2.5 mb-2 overflow-hidden shrink-0">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/70">
               <Calendar className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>November 2026</span>
             </div>
+            <span className="text-[11px] font-black text-black/75">
+              ₹{remainingBudget.toLocaleString()} left
+            </span>
+          </div>
 
-            <div className="flex items-baseline gap-1 my-0.5">
+          <div className="flex items-baseline justify-between mb-1.5">
+            <div className="flex items-baseline gap-1">
               <span className="text-2xl font-black text-black tracking-tight leading-none">
                 ₹{totalExpenses.toLocaleString()}
               </span>
@@ -168,25 +172,17 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
                 / ₹{monthlyBudget.toLocaleString()}
               </span>
             </div>
-
-            {/* Spending Progress Bar */}
-            <div className="w-full mt-1.5">
-              <div className="w-full h-3 bg-white neo-border rounded-full overflow-hidden p-[1px]">
-                <div
-                  className="h-full bg-[#FF85A2] rounded-full transition-all duration-300"
-                  style={{ width: `${budgetSpentPercent}%` }}
-                />
-              </div>
-              <div className="flex justify-between items-center text-[10px] font-bold text-black/70 mt-1">
-                <span>{budgetSpentPercent}% spent</span>
-                <span>₹{remainingBudget.toLocaleString()} left</span>
-              </div>
-            </div>
+            <span className="text-xs font-black text-black/80">
+              {budgetSpentPercent}% spent
+            </span>
           </div>
 
-          {/* Money Bag Mascot */}
-          <div className="shrink-0 scale-90 -mr-2">
-            <BudgetMascot spentRatio={budgetSpentPercent / 100} />
+          {/* Full-width Spending Progress Bar */}
+          <div className="w-full h-2.5 bg-white neo-border rounded-full overflow-hidden p-[1px]">
+            <div
+              className="h-full bg-[#FF85A2] rounded-full transition-all duration-300"
+              style={{ width: `${budgetSpentPercent}%` }}
+            />
           </div>
         </div>
 

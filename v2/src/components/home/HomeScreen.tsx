@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+  Sun,
   Moon,
   Sunset,
   ArrowRight,
@@ -13,7 +14,6 @@ import { motion } from 'framer-motion'
 import { Habit, Weekday } from '../../types/habit'
 import { Workout } from '../../types/workout'
 import { Transaction } from '../../types/budget'
-import { SunMascot } from '../SunMascot'
 
 interface HomeScreenProps {
   habits: Habit[]
@@ -40,7 +40,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     if (hour < 12) {
       return {
         text: 'Good Morning.',
-        icon: <SunMascot size={36} />,
+        icon: <Sun className="w-5 h-5 text-black stroke-[2.5]" />,
         bg: 'bg-[#FDE047]',
       }
     }
@@ -107,12 +107,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               </p>
             </div>
 
-            {/* Signature Cartoon Sun Mascot Tile */}
+            {/* Dynamic Time-of-Day Icon Tile */}
             <div
-              className="w-12 h-12 bg-[#FDE047] neo-border neo-shadow rounded-2xl flex items-center justify-center p-1 overflow-hidden shrink-0"
-              title="Good Vibes Sun"
+              className={`w-11 h-11 ${greeting.bg} neo-border neo-shadow rounded-xl flex items-center justify-center shrink-0`}
+              title={greeting.text}
             >
-              <SunMascot size={36} />
+              {greeting.icon}
             </div>
           </div>
         </header>

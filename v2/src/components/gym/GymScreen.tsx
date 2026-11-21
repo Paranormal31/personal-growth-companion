@@ -14,7 +14,6 @@ import {
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Workout } from '../../types/workout'
-import { GymMascot } from './GymMascot'
 import { AddWorkoutModal } from './AddWorkoutModal'
 import { WorkoutDetailModal } from './WorkoutDetailModal'
 
@@ -106,40 +105,42 @@ export const GymScreen: React.FC<GymScreenProps> = ({
           </div>
         </header>
 
-        {/* Weekly Progress Card (Lime Green) */}
-        <div className="w-full bg-[#D4F972] neo-border neo-shadow rounded-3xl p-3.5 mb-2.5 flex items-center justify-between">
-          <div className="flex-1 pr-2">
-            <span className="text-xs font-black uppercase tracking-wider text-black/70">
-              Weekly Progress
-            </span>
-            <div className="flex items-baseline gap-1 my-0.5">
-              <span className="text-3xl font-black text-black tracking-tight leading-none">
-                {workoutsCompletedThisWeek}/{weeklyTarget}
-              </span>
-              <span className="text-xs font-black text-black/70">workouts</span>
+        {/* Weekly Progress Card (Lime Green) - Compact Horizontal Layout without Mascot */}
+        <div className="w-full bg-[#D4F972] neo-border neo-shadow rounded-2xl pl-3.5 pr-4 py-2.5 mb-2 overflow-hidden shrink-0">
+          <div className="flex items-center justify-between gap-3">
+            {/* Left Side: Label and Counter */}
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div>
+                <span className="text-[11px] font-black uppercase tracking-wider text-black/70 block leading-tight">
+                  Weekly Progress
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-2xl font-black text-black tracking-tight leading-none">
+                    {workoutsCompletedThisWeek}/{weeklyTarget}
+                  </span>
+                  <span className="text-xs font-black text-black/70">workouts</span>
+                </div>
+              </div>
             </div>
 
-            {/* Target Indicators */}
-            <div className="flex items-center gap-1.5 mt-2">
+            {/* Right Side: Target Indicator Checkmark Tiles */}
+            <div className="flex items-center gap-1.5 shrink-0 justify-end">
               {Array.from({ length: weeklyTarget }).map((_, idx) => {
                 const isDone = idx < workoutsCompletedThisWeek
                 return (
                   <div
                     key={idx}
-                    className={`w-6 h-6 rounded-lg neo-border flex items-center justify-center ${
-                      isDone ? 'bg-[#FDE047]' : 'bg-white/80'
+                    className={`w-6 h-6 rounded-md border-2 border-black flex items-center justify-center neo-shadow-sm shrink-0 ${
+                      isDone ? 'bg-[#FDE047]' : 'bg-white'
                     }`}
                   >
-                    {isDone && <Check className="w-3.5 h-3.5 text-black stroke-[3.5]" />}
+                    {isDone && (
+                      <Check className="w-3.5 h-3.5 text-black stroke-[3.5] overflow-visible" />
+                    )}
                   </div>
                 )
               })}
             </div>
-          </div>
-
-          {/* Gym Mascot */}
-          <div className="shrink-0 scale-90 -mr-2">
-            <GymMascot completed={workoutsCompletedThisWeek} target={weeklyTarget} />
           </div>
         </div>
 
