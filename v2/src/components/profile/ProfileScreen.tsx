@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import {
-  Bell,
   Flame,
   Target,
   BarChart3,
@@ -83,24 +82,13 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       {/* Top Fixed Section: Header & User Card & 3 Stats */}
       <div className="shrink-0">
         {/* Header */}
-        <header className="relative w-full pt-1 pb-2 shrink-0 flex items-center justify-between">
-          <div>
-            <h1 className="text-[32px] font-black text-black leading-none tracking-tight">
-              Profile<span className="text-[#FDE047]">.</span>
-            </h1>
-            <p className="text-[13px] font-bold text-black/80 mt-1">
-              Your space, your progress.
-            </p>
-          </div>
-
-          <button
-            onClick={() => onNotify('🔔 You have 3 active goals in progress!')}
-            className="relative w-10 h-10 bg-white neo-border neo-shadow rounded-xl flex items-center justify-center neo-pressable cursor-pointer"
-            aria-label="Notifications"
-          >
-            <Bell className="w-5 h-5 text-black stroke-[2.2]" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-[#FF70A6] border border-black rounded-full" />
-          </button>
+        <header className="relative w-full pt-0.5 pb-2 shrink-0">
+          <h1 className="text-[28px] sm:text-[32px] font-black text-black leading-none tracking-tight">
+            Profile<span className="text-[#FDE047]">.</span>
+          </h1>
+          <p className="text-[13px] font-bold text-black/80 mt-1">
+            Your space, your progress.
+          </p>
         </header>
 
         {/* User Card */}

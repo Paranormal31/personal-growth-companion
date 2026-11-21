@@ -1,7 +1,5 @@
 import React from 'react'
 import {
-  User,
-  Bell,
   Moon,
   Sunset,
   ArrowRight,
@@ -23,7 +21,7 @@ interface HomeScreenProps {
   transactions: Transaction[]
   currentWeekday: Weekday
   onNavigateTab: (tab: 'habit' | 'gym' | 'home' | 'budget' | 'profile') => void
-  onOpenProfile: () => void
+  onOpenProfile?: () => void
   onNotify: (msg: string) => void
 }
 
@@ -98,33 +96,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       {/* Top Fixed Section: Header & Daily Overview */}
       <div className="shrink-0">
         {/* Header */}
-        <header className="relative w-full pt-1 pb-2 shrink-0">
-          <div className="flex items-center justify-between mb-2">
-            <button
-              onClick={onOpenProfile}
-              className="w-10 h-10 bg-white neo-border neo-shadow rounded-xl flex items-center justify-center neo-pressable cursor-pointer"
-              aria-label="User Profile"
-            >
-              <User className="w-5 h-5 text-black stroke-[2.2]" />
-            </button>
-
-            <button
-              onClick={() =>
-                onNotify(
-                  `✨ Great progress today! ${completedHabitsCount}/${totalHabitsCount} habits checked.`
-                )
-              }
-              className="relative w-10 h-10 bg-white neo-border neo-shadow rounded-xl flex items-center justify-center neo-pressable cursor-pointer"
-              aria-label="Notifications"
-            >
-              <Bell className="w-5 h-5 text-black stroke-[2.2]" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-[#FF70A6] border border-black rounded-full" />
-            </button>
-          </div>
-
+        <header className="relative w-full pt-0.5 pb-2 shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-[30px] font-black text-black leading-none tracking-tight">
+              <h1 className="text-[26px] sm:text-[30px] font-black text-black leading-none tracking-tight">
                 {greeting.text}
               </h1>
               <p className="text-[13px] font-bold text-black/80 mt-1 flex items-center gap-1">

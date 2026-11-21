@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 import {
-  User,
-  Bell,
   Plus,
   TrendingUp,
   TrendingDown,
@@ -31,7 +29,7 @@ interface BudgetScreenProps {
   onAddTransaction: (transaction: Omit<Transaction, 'id'>) => void
   onDeleteTransaction: (id: string) => void
   onNotify: (msg: string) => void
-  onOpenProfile: () => void
+  onOpenProfile?: () => void
 }
 
 const ALL_CATEGORIES: BudgetCategory[] = [
@@ -129,31 +127,10 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
       {/* Top Fixed Section: Header, Monthly Overview & Financial Summary */}
       <div className="shrink-0">
         {/* Header */}
-        <header className="relative w-full pt-1 pb-2 shrink-0">
-          <div className="flex items-center justify-between mb-2">
-            <button
-              onClick={onOpenProfile}
-              className="w-10 h-10 bg-white neo-border neo-shadow rounded-xl flex items-center justify-center neo-pressable cursor-pointer"
-              aria-label="User Profile"
-            >
-              <User className="w-5 h-5 text-black stroke-[2.2]" />
-            </button>
-
-            <button
-              onClick={() =>
-                onNotify(`💡 Remaining monthly budget: ₹${remainingBudget.toLocaleString()}`)
-              }
-              className="relative w-10 h-10 bg-white neo-border neo-shadow rounded-xl flex items-center justify-center neo-pressable cursor-pointer"
-              aria-label="Notifications"
-            >
-              <Bell className="w-5 h-5 text-black stroke-[2.2]" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-[#FF70A6] border border-black rounded-full" />
-            </button>
-          </div>
-
+        <header className="relative w-full pt-0.5 pb-2 shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-[30px] font-black text-black leading-none tracking-tight">
+              <h1 className="text-[26px] sm:text-[30px] font-black text-black leading-none tracking-tight">
                 Budget Tracker<span className="text-[#FDE047]">.</span>
               </h1>
               <p className="text-[13px] font-bold text-black/80 mt-1">
@@ -166,7 +143,7 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsAddModalOpen(true)}
-              className="w-12 h-12 bg-[#FDE047] neo-border neo-shadow rounded-2xl flex items-center justify-center select-none cursor-pointer"
+              className="w-11 h-11 bg-[#FDE047] neo-border neo-shadow rounded-xl flex items-center justify-center select-none cursor-pointer"
               title="Add Transaction"
               aria-label="Add Transaction"
             >

@@ -1,98 +1,16 @@
-import React, { useState } from 'react'
-import { User, Bell, RotateCcw, CheckCheck, RefreshCw } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import React from 'react'
+import { motion } from 'framer-motion'
 
 interface PlanHeaderProps {
-  onResetDemo: () => void
-  onCompleteAll: () => void
-  onClearAll: () => void
-  onNotify: (msg: string) => void
+  onResetDemo?: () => void
+  onCompleteAll?: () => void
+  onClearAll?: () => void
+  onNotify?: (msg: string) => void
 }
 
-export const PlanHeader: React.FC<PlanHeaderProps> = ({
-  onResetDemo,
-  onCompleteAll,
-  onClearAll,
-  onNotify,
-}) => {
-  const [profileOpen, setProfileOpen] = useState(false)
-
+export const PlanHeader: React.FC<PlanHeaderProps> = () => {
   return (
     <header className="relative w-full pt-1 pb-3 shrink-0">
-      {/* Top action row */}
-      <div className="flex items-center justify-between mb-2.5">
-        {/* Profile Button */}
-        <div className="relative">
-          <button
-            onClick={() => setProfileOpen(!profileOpen)}
-            className="w-10 h-10 bg-white neo-border neo-shadow rounded-xl flex items-center justify-center neo-pressable cursor-pointer"
-            aria-label="User Profile"
-          >
-            <User className="w-5 h-5 text-black stroke-[2.2]" />
-          </button>
-
-          {/* Quick Settings / State Reset Popover */}
-          <AnimatePresence>
-            {profileOpen && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: -4 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: -4 }}
-                className="absolute left-0 mt-2 z-50 w-56 bg-white neo-border neo-shadow-lg rounded-2xl p-3"
-              >
-                <div className="text-xs font-black uppercase tracking-wider text-black/60 mb-2">
-                  Demo Controls
-                </div>
-                <div className="space-y-1.5">
-                  <button
-                    onClick={() => {
-                      onResetDemo()
-                      setProfileOpen(false)
-                      onNotify('Reset to default habits!')
-                    }}
-                    className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-bold text-black hover:bg-[#FDE047] flex items-center gap-2 neo-border transition-colors cursor-pointer"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    Reset to Default (3/4)
-                  </button>
-                  <button
-                    onClick={() => {
-                      onCompleteAll()
-                      setProfileOpen(false)
-                      onNotify('Celebration time! 4/4 habits done! 🎉')
-                    }}
-                    className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-bold text-black hover:bg-[#D4F972] flex items-center gap-2 neo-border transition-colors cursor-pointer"
-                  >
-                    <CheckCheck className="w-3.5 h-3.5" />
-                    Complete All
-                  </button>
-                  <button
-                    onClick={() => {
-                      onClearAll()
-                      setProfileOpen(false)
-                      onNotify('All habits cleared!')
-                    }}
-                    className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-bold text-black hover:bg-[#DDD6FE] flex items-center gap-2 neo-border transition-colors cursor-pointer"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    Clear All
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Notification Button */}
-        <button
-          onClick={() => onNotify('🔔 Plan update: 3 tasks and 1 event scheduled today.')}
-          className="relative w-10 h-10 bg-white neo-border neo-shadow rounded-xl flex items-center justify-center neo-pressable cursor-pointer"
-          aria-label="Notifications"
-        >
-          <Bell className="w-5 h-5 text-black stroke-[2.2]" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-[#FF70A6] border border-black rounded-full" />
-        </button>
-      </div>
 
       {/* Heading and Yellow Calendar Tile */}
       <div className="flex items-center justify-between">
