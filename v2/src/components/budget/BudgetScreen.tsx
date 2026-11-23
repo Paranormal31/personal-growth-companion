@@ -42,7 +42,7 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
   // Dynamic Categories with localStorage persistence
   const [categories, setCategories] = useState<CategoryItem[]>(() => {
     try {
-      const saved = localStorage.getItem('neo_budget_categories_v2')
+      const saved = localStorage.getItem('neo_budget_categories_v3')
       if (saved) {
         const parsed = JSON.parse(saved)
         if (Array.isArray(parsed) && parsed.length > 0) return parsed
@@ -55,7 +55,7 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
 
   useEffect(() => {
     try {
-      localStorage.setItem('neo_budget_categories_v2', JSON.stringify(categories))
+      localStorage.setItem('neo_budget_categories_v3', JSON.stringify(categories))
     } catch (e) {
       console.error('Failed to save categories', e)
     }
@@ -292,52 +292,64 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
           </span>
         </div>
 
-        {transactions.map((tx) => {
-          const isExpense = tx.type === 'expense'
-          const catColor = getCategoryColor(tx.category)
+        {transactions.length === 0 ? (
+          <div className="w-full bg-white neo-border neo-shadow rounded-2xl p-5 text-center flex flex-col items-center justify-center my-1 select-none">
+            <div className="w-10 h-10 rounded-xl bg-[#FDE047] neo-border flex items-center justify-center mb-2">
+              <PiggyBank className="w-5 h-5 text-black stroke-[2.4]" />
+            </div>
+            <h4 className="text-xs font-black text-black">No transactions logged yet</h4>
+            <p className="text-[11px] font-bold text-black/50 mt-0.5 max-w-[240px]">
+              Tap the + button above to record your first income or expense!
+            </p>
+          </div>
+        ) : (
+          transactions.map((tx) => {
+            const isExpense = tx.type === 'expense'
+            const catColor = getCategoryColor(tx.category)
 
-          return (
-            <motion.div
-              key={tx.id}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setSelectedTransaction(tx)}
-              className="w-full bg-white neo-border neo-shadow rounded-2xl p-2.5 flex items-center justify-between cursor-pointer neo-pressable"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div
-                  className="w-10 h-10 rounded-xl neo-border flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: catColor }}
-                >
-                  {getCategoryIcon(tx.category)}
-                </div>
-                <div className="min-w-0">
-                  <h4 className="text-xs font-black text-black leading-tight truncate">
-                    {tx.name}
-                  </h4>
-                  <div className="flex items-center gap-1.5 mt-0.5 text-[10.5px] font-bold text-black/60">
-                    <span>{tx.category}</span>
-                    <span>•</span>
-                    <span>{tx.date}</span>
+            return (
+              <motion.div
+                key={tx.id}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setSelectedTransaction(tx)}
+                className="w-full bg-white neo-border neo-shadow rounded-2xl p-2.5 flex items-center justify-between cursor-pointer neo-pressable"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div
+                    className="w-10 h-10 rounded-xl neo-border flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: catColor }}
+                  >
+                    {getCategoryIcon(tx.category)}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-xs font-black text-black leading-tight truncate">
+                      {tx.name}
+                    </h4>
+                    <div className="flex items-center gap-1.5 mt-0.5 text-[10.5px] font-bold text-black/60">
+                      <span>{tx.category}</span>
+                      <span>•</span>
+                      <span>{tx.date}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <span
-                  className={`text-xs font-black ${
-                    isExpense ? 'text-black' : 'text-[#16A34A]'
-                  }`}
-                >
-                  {isExpense ? '-' : '+'}₹{tx.amount.toLocaleString()}
-                </span>
-                <div className="w-6 h-6 rounded-lg neo-border bg-[#F4F0E6] flex items-center justify-center">
-                  <ChevronRight className="w-3.5 h-3.5 text-black stroke-[2.6]" />
+                <div className="flex items-center gap-2 shrink-0">
+                  <span
+                    className={`text-xs font-black ${
+                      isExpense ? 'text-black' : 'text-[#16A34A]'
+                    }`}
+                  >
+                    {isExpense ? '-' : '+'}₹{tx.amount.toLocaleString()}
+                  </span>
+                  <div className="w-6 h-6 rounded-lg neo-border bg-[#F4F0E6] flex items-center justify-center">
+                    <ChevronRight className="w-3.5 h-3.5 text-black stroke-[2.6]" />
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          )
-        })}
+              </motion.div>
+            )
+          })
+        )}
       </div>
 
       {/* Add / Edit Transaction Modal */}

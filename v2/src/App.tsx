@@ -97,44 +97,62 @@ export const App: React.FC = () => {
   // 1. Shared habits persistence in localStorage
   const [habits, setHabits] = useState<Habit[]>(() => {
     try {
-      const saved = localStorage.getItem('neo_habits_v2_tracker')
+      const saved = localStorage.getItem('neo_habits_v3_tracker')
       if (saved) {
         const parsed = JSON.parse(saved)
-        return parsed.map((h: Habit, idx: number) => {
-          const defaultHabit =
-            INITIAL_HABITS.find(
-              (init) => init.name.toLowerCase() === h.name.toLowerCase()
-            ) || INITIAL_HABITS[idx % INITIAL_HABITS.length]
-          const weekly = h.weeklyCompletions || defaultHabit.weeklyCompletions
-          const activeDays =
-            h.activeDays ||
-            defaultHabit.activeDays || [
-              'Mon',
-              'Tue',
-              'Wed',
-              'Thu',
-              'Fri',
-              'Sat',
-              'Sun',
-            ]
-          const streak = computeHabitStreak(
-            weekly,
-            activeDays,
-            currentWeekday,
-            h.streak ?? defaultHabit.streak
-          )
+        if (Array.isArray(parsed)) {
+          return parsed.map((h: Habit, idx: number) => {
+            const defaultHabit =
+              INITIAL_HABITS.find(
+                (init) => init.name.toLowerCase() === h.name.toLowerCase()
+              ) || INITIAL_HABITS[idx % (INITIAL_HABITS.length || 1)] || h
+            const weekly =
+              h.weeklyCompletions ||
+              defaultHabit?.weeklyCompletions || {
+                Mon: false,
+                Tue: false,
+                Wed: false,
+                Thu: false,
+                Fri: false,
+                Sat: false,
+                Sun: false,
+              }
+            const activeDays =
+              h.activeDays ||
+              defaultHabit?.activeDays || [
+                'Mon',
+                'Tue',
+                'Wed',
+                'Thu',
+                'Fri',
+                'Sat',
+                'Sun',
+              ]
+            const streak = computeHabitStreak(
+              weekly,
+              activeDays,
+              currentWeekday,
+              h.streak ?? 0
+            )
 
-          return {
-            ...defaultHabit,
-            ...h,
-            streak,
-            activeDays,
-            weeklyCompletions: weekly,
-            startTime: h.startTime || defaultHabit.startTime,
-            endTime: h.endTime || defaultHabit.endTime,
-            type: h.type || defaultHabit.type || 'task',
-          }
-        })
+            return {
+              id: h.id || `habit-${idx}`,
+              name: h.name || 'Habit',
+              category: h.category || 'general',
+              accentColor: h.accentColor || '#F9A8D4',
+              iconName: h.iconName || 'star',
+              completed: !!h.completed,
+              ...defaultHabit,
+              ...h,
+              streak,
+              activeDays,
+              weeklyCompletions: weekly,
+              startTime: h.startTime || defaultHabit?.startTime || '9:00 AM',
+              endTime: h.endTime || defaultHabit?.endTime || '9:30 AM',
+              type: h.type || defaultHabit?.type || 'task',
+            }
+          })
+        }
       }
     } catch {
       // fallback
@@ -144,7 +162,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     try {
-      localStorage.setItem('neo_habits_v2_tracker', JSON.stringify(habits))
+      localStorage.setItem('neo_habits_v3_tracker', JSON.stringify(habits))
     } catch (e) {
       console.error('Failed to save habits to localStorage', e)
     }
@@ -153,7 +171,7 @@ export const App: React.FC = () => {
   // 2. Shared workouts persistence in localStorage
   const [workouts, setWorkouts] = useState<Workout[]>(() => {
     try {
-      const saved = localStorage.getItem('neo_workouts_v2')
+      const saved = localStorage.getItem('neo_workouts_v3')
       if (saved) return JSON.parse(saved)
     } catch (e) {
       console.error('Failed to load workouts from localStorage', e)
@@ -163,7 +181,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     try {
-      localStorage.setItem('neo_workouts_v2', JSON.stringify(workouts))
+      localStorage.setItem('neo_workouts_v3', JSON.stringify(workouts))
     } catch (e) {
       console.error('Failed to save workouts to localStorage', e)
     }
@@ -172,7 +190,7 @@ export const App: React.FC = () => {
   // 3. Shared budget transactions persistence in localStorage
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     try {
-      const saved = localStorage.getItem('neo_transactions_v2')
+      const saved = localStorage.getItem('neo_transactions_v3')
       if (saved) return JSON.parse(saved)
     } catch (e) {
       console.error('Failed to load transactions from localStorage', e)
@@ -182,7 +200,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     try {
-      localStorage.setItem('neo_transactions_v2', JSON.stringify(transactions))
+      localStorage.setItem('neo_transactions_v3', JSON.stringify(transactions))
     } catch (e) {
       console.error('Failed to save transactions to localStorage', e)
     }
@@ -470,7 +488,7 @@ export const App: React.FC = () => {
   const completionPercentage =
     totalScheduledSlots > 0
       ? Math.round((totalCompletedSlots / totalScheduledSlots) * 100)
-      : 79
+      : 0
 
   return (
     <PhoneChassis>
@@ -581,6 +599,9 @@ export const App: React.FC = () => {
             <ProfileScreen
               onNotify={(msg) => setToastMessage(msg)}
               onResetAllData={handleResetAllData}
+              currentStreakDays={currentStreakDays}
+              completionPercentage={completionPercentage}
+              totalHabitsCount={habits.length}
             />
           </div>
           <div className="shrink-0">

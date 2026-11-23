@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Reorder, useDragControls } from 'framer-motion'
+import { Sparkles } from 'lucide-react'
 import { Habit, Weekday } from '../types/habit'
 import { HabitItem } from './HabitItem'
 
@@ -95,25 +96,37 @@ export const HabitList: React.FC<HabitListProps> = ({
         </button>
       </div>
 
-      {/* Reorderable Habit items stack (drag-and-drop ordering via handle only) */}
-      <Reorder.Group
-        axis="y"
-        values={habits}
-        onReorder={onReorder}
-        className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-2 py-0.5 pb-8 pr-1.5 pl-0.5"
-      >
-        {habits.map((habit) => (
-          <ReorderableHabitRow
-            key={habit.id}
-            habit={habit}
-            isExpanded={expandedHabitId === habit.id}
-            onToggleExpand={() => handleToggleExpand(habit.id)}
-            onToggleComplete={() => onToggle(habit.id)}
-            onToggleDay={(day) => onToggleDay(habit.id, day)}
-            onEdit={() => onEditHabit?.(habit)}
-          />
-        ))}
-      </Reorder.Group>
+      {/* Reorderable Habit items stack or empty state */}
+      {habits.length === 0 ? (
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-white neo-border neo-shadow rounded-2xl my-2 select-none">
+          <div className="w-12 h-12 rounded-xl bg-[#FDE047] neo-border flex items-center justify-center mb-2">
+            <Sparkles className="w-6 h-6 stroke-[2.4] text-black" />
+          </div>
+          <h3 className="text-sm font-black text-black">No habits found</h3>
+          <p className="text-xs font-bold text-black/50 mt-1 max-w-[220px]">
+            Tap the yellow + button above to create your first personal habit!
+          </p>
+        </div>
+      ) : (
+        <Reorder.Group
+          axis="y"
+          values={habits}
+          onReorder={onReorder}
+          className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-2 py-0.5 pb-8 pr-1.5 pl-0.5"
+        >
+          {habits.map((habit) => (
+            <ReorderableHabitRow
+              key={habit.id}
+              habit={habit}
+              isExpanded={expandedHabitId === habit.id}
+              onToggleExpand={() => handleToggleExpand(habit.id)}
+              onToggleComplete={() => onToggle(habit.id)}
+              onToggleDay={(day) => onToggleDay(habit.id, day)}
+              onEdit={() => onEditHabit?.(habit)}
+            />
+          ))}
+        </Reorder.Group>
+      )}
     </div>
   )
 }

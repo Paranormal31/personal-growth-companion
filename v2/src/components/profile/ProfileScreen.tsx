@@ -18,11 +18,17 @@ import { ProfileModal, ProfileModalType } from './ProfileModal'
 interface ProfileScreenProps {
   onNotify: (msg: string) => void
   onResetAllData?: () => void
+  currentStreakDays?: number
+  completionPercentage?: number
+  totalHabitsCount?: number
 }
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onNotify,
   onResetAllData,
+  currentStreakDays = 0,
+  completionPercentage = 0,
+  totalHabitsCount = 0,
 }) => {
   const [activeModal, setActiveModal] = useState<ProfileModalType | null>(null)
 
@@ -118,36 +124,36 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
         {/* 3 Stat Cards side-by-side */}
         <div className="grid grid-cols-3 gap-2 mb-2">
-          {/* Card 1: 28 Day Streak */}
+          {/* Card 1: Day Streak */}
           <div className="bg-[#FEF08A] neo-border neo-shadow-sm rounded-2xl p-2.5 flex flex-col items-center text-center">
             <Flame className="w-5 h-5 text-black stroke-[2.5] mb-1" />
             <span className="text-xl font-black text-black leading-tight">
-              28
+              {currentStreakDays}
             </span>
             <span className="text-[10px] font-black text-black/70 leading-tight">
               Day Streak
             </span>
           </div>
 
-          {/* Card 2: 86% Habit Completion */}
+          {/* Card 2: Habit Completion */}
           <div className="bg-[#D4F972] neo-border neo-shadow-sm rounded-2xl p-2.5 flex flex-col items-center text-center">
             <Target className="w-5 h-5 text-black stroke-[2.5] mb-1" />
             <span className="text-xl font-black text-black leading-tight">
-              86%
+              {completionPercentage}%
             </span>
             <span className="text-[10px] font-black text-black/70 leading-tight">
               Habit Completion
             </span>
           </div>
 
-          {/* Card 3: 3 Active Goals */}
+          {/* Card 3: Active Habits */}
           <div className="bg-[#F9A8D4] neo-border neo-shadow-sm rounded-2xl p-2.5 flex flex-col items-center text-center">
             <BarChart3 className="w-5 h-5 text-black stroke-[2.5] mb-1" />
             <span className="text-xl font-black text-black leading-tight">
-              3
+              {totalHabitsCount}
             </span>
             <span className="text-[10px] font-black text-black/70 leading-tight">
-              Active Goals
+              Active Habits
             </span>
           </div>
         </div>

@@ -35,24 +35,28 @@ export const ProgressCard: React.FC<ProgressCardProps> = ({ habits }) => {
 
         {/* Right Side: Individual Completion Indicator Tiles */}
         <div className="flex items-center gap-1.5 flex-wrap justify-end shrink-0">
-          {habits.map((habit) => (
-            <motion.div
-              key={habit.id}
-              layout
-              initial={false}
-              animate={{
-                backgroundColor: habit.completed ? '#FDE047' : '#FFFFFF',
-                scale: habit.completed ? [1, 1.15, 1] : 1,
-              }}
-              transition={{ duration: 0.18 }}
-              className="w-6 h-6 rounded-md border-2 border-black flex items-center justify-center neo-shadow-sm shrink-0"
-              title={`${habit.name}: ${habit.completed ? 'Completed' : 'Pending'}`}
-            >
-              {habit.completed && (
-                <Check className="w-3.5 h-3.5 text-black stroke-[3.5] overflow-visible" />
-              )}
-            </motion.div>
-          ))}
+          {total === 0 ? (
+            <span className="text-[11px] font-extrabold text-black/50">Add your first habit</span>
+          ) : (
+            habits.map((habit) => (
+              <motion.div
+                key={habit.id}
+                layout
+                initial={false}
+                animate={{
+                  backgroundColor: habit.completed ? '#FDE047' : '#FFFFFF',
+                  scale: habit.completed ? [1, 1.15, 1] : 1,
+                }}
+                transition={{ duration: 0.18 }}
+                className="w-6 h-6 rounded-md border-2 border-black flex items-center justify-center neo-shadow-sm shrink-0"
+                title={`${habit.name}: ${habit.completed ? 'Completed' : 'Pending'}`}
+              >
+                {habit.completed && (
+                  <Check className="w-3.5 h-3.5 text-black stroke-[3.5] overflow-visible" />
+                )}
+              </motion.div>
+            ))
+          )}
         </div>
       </div>
     </div>

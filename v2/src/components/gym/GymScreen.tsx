@@ -226,46 +226,58 @@ export const GymScreen: React.FC<GymScreenProps> = ({
           </span>
         </div>
 
-        {workouts.map((workout) => (
-          <motion.div
-            key={workout.id}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setSelectedWorkout(workout)}
-            className="w-full bg-white neo-border neo-shadow rounded-2xl p-2.5 flex items-center justify-between cursor-pointer neo-pressable"
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-11 h-11 rounded-xl neo-border flex items-center justify-center shrink-0 ${getWorkoutBg(
-                  workout.type
-                )}`}
-              >
-                {getWorkoutIcon(workout.type)}
-              </div>
-              <div>
-                <h4 className="text-xs font-black text-black leading-tight">
-                  {workout.name}
-                </h4>
-                <div className="flex items-center gap-2 mt-0.5 text-[11px] font-bold text-black/60">
-                  <span>{workout.date}</span>
-                  <span>•</span>
-                  <span>{workout.duration}</span>
+        {workouts.length === 0 ? (
+          <div className="w-full bg-white neo-border neo-shadow rounded-2xl p-5 text-center flex flex-col items-center justify-center my-1 select-none">
+            <div className="w-10 h-10 rounded-xl bg-[#FDE047] neo-border flex items-center justify-center mb-2">
+              <Dumbbell className="w-5 h-5 text-black stroke-[2.4]" />
+            </div>
+            <h4 className="text-xs font-black text-black">No workouts logged yet</h4>
+            <p className="text-[11px] font-bold text-black/50 mt-0.5 max-w-[240px]">
+              Hit &quot;Start Workout Session&quot; or tap the + button to log your first exercise!
+            </p>
+          </div>
+        ) : (
+          workouts.map((workout) => (
+            <motion.div
+              key={workout.id}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setSelectedWorkout(workout)}
+              className="w-full bg-white neo-border neo-shadow rounded-2xl p-2.5 flex items-center justify-between cursor-pointer neo-pressable"
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-11 h-11 rounded-xl neo-border flex items-center justify-center shrink-0 ${getWorkoutBg(
+                    workout.type
+                  )}`}
+                >
+                  {getWorkoutIcon(workout.type)}
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-black leading-tight">
+                    {workout.name}
+                  </h4>
+                  <div className="flex items-center gap-2 mt-0.5 text-[11px] font-bold text-black/60">
+                    <span>{workout.date}</span>
+                    <span>•</span>
+                    <span>{workout.duration}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-2">
-              {workout.calories && (
-                <div className="px-2 py-0.5 bg-[#FFFDF5] neo-border rounded-lg text-[10px] font-black text-black">
-                  {workout.calories} kcal
+              <div className="flex items-center gap-2">
+                {workout.calories && (
+                  <div className="px-2 py-0.5 bg-[#FFFDF5] neo-border rounded-lg text-[10px] font-black text-black">
+                    {workout.calories} kcal
+                  </div>
+                )}
+                <div className="w-7 h-7 rounded-lg neo-border bg-[#F4F0E6] flex items-center justify-center">
+                  <ChevronRight className="w-4 h-4 text-black stroke-[2.6]" />
                 </div>
-              )}
-              <div className="w-7 h-7 rounded-lg neo-border bg-[#F4F0E6] flex items-center justify-center">
-                <ChevronRight className="w-4 h-4 text-black stroke-[2.6]" />
               </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          ))
+        )}
       </div>
 
       {/* Add / Edit Workout Modal */}
