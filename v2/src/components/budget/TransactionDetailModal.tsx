@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
   Trash2,
+  Pencil,
   Calendar,
   Tag,
   FileText,
@@ -16,17 +17,22 @@ interface TransactionDetailModalProps {
   transaction: Transaction | null
   onClose: () => void
   onDelete?: (id: string) => void
+  onEdit?: (transaction: Transaction) => void
+  categoryColor?: string
 }
 
 export const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
   transaction,
   onClose,
   onDelete,
+  onEdit,
+  categoryColor: customCategoryColor,
 }) => {
   if (!transaction) return null
 
   const isExpense = transaction.type === 'expense'
-  const categoryColor = CATEGORY_COLORS[transaction.category] || '#E2E8F0'
+  const categoryColor =
+    customCategoryColor || CATEGORY_COLORS[transaction.category] || '#E2E8F0'
 
   return (
     <AnimatePresence>
@@ -115,6 +121,18 @@ export const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {onEdit && (
+              <button
+                onClick={() => {
+                  onEdit(transaction)
+                  onClose()
+                }}
+                className="px-3 py-2.5 bg-[#FFD027] neo-border rounded-xl flex items-center justify-center text-black font-bold text-xs neo-pressable cursor-pointer"
+                title="Edit transaction"
+              >
+                <Pencil className="w-4 h-4 stroke-[2.4]" />
+              </button>
+            )}
             {onDelete && (
               <button
                 onClick={() => {

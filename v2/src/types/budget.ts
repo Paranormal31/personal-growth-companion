@@ -1,14 +1,13 @@
 export type TransactionType = 'expense' | 'income'
 
-export type BudgetCategory =
-  | 'Food & Dining'
-  | 'Transport'
-  | 'Shopping'
-  | 'Utilities'
-  | 'Health'
-  | 'Entertainment'
-  | 'Subscriptions'
-  | 'Others'
+export type BudgetCategory = string
+
+export interface CategoryItem {
+  id: string
+  name: string
+  iconName: string
+  color: string
+}
 
 export interface Transaction {
   id: string

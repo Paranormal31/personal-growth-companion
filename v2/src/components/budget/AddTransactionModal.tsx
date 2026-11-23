@@ -1,44 +1,32 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
-  Plus,
-  Utensils,
-  Car,
-  ShoppingBag,
-  Zap,
-  HeartPulse,
-  Film,
-  Repeat,
-  CircleDot,
-  Calendar,
   FileText,
   Check,
 } from 'lucide-react'
-import { Transaction, TransactionType, BudgetCategory } from '../../types/budget'
-import { CATEGORY_COLORS } from '../../constants/initialTransactions'
+import { Transaction, TransactionType, BudgetCategory, CategoryItem } from '../../types/budget'
+import { CATEGORY_COLORS, INITIAL_CATEGORIES } from '../../constants/initialTransactions'
+import { getCategoryIconComponent } from '../../constants/icons'
 
 interface AddTransactionModalProps {
   isOpen: boolean
   onClose: () => void
   onAddTransaction: (transaction: Omit<Transaction, 'id'>) => void
+  editingTransaction?: Transaction | null
+  onUpdateTransaction?: (transaction: Transaction) => void
+  categories?: CategoryItem[]
+  onManageCategories?: () => void
 }
-
-const CATEGORIES: { category: BudgetCategory; icon: React.ReactNode }[] = [
-  { category: 'Food & Dining', icon: <Utensils className="w-4 h-4 stroke-[2.4]" /> },
-  { category: 'Transport', icon: <Car className="w-4 h-4 stroke-[2.4]" /> },
-  { category: 'Shopping', icon: <ShoppingBag className="w-4 h-4 stroke-[2.4]" /> },
-  { category: 'Utilities', icon: <Zap className="w-4 h-4 stroke-[2.4]" /> },
-  { category: 'Health', icon: <HeartPulse className="w-4 h-4 stroke-[2.4]" /> },
-  { category: 'Entertainment', icon: <Film className="w-4 h-4 stroke-[2.4]" /> },
-  { category: 'Subscriptions', icon: <Repeat className="w-4 h-4 stroke-[2.4]" /> },
-  { category: 'Others', icon: <CircleDot className="w-4 h-4 stroke-[2.4]" /> },
-]
 
 export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
   isOpen,
   onClose,
   onAddTransaction,
+  editingTransaction,
+  onUpdateTransaction,
+  categories = INITIAL_CATEGORIES,
+  onManageCategories,
 }) => {
   const [name, setName] = useState('')
   const [type, setType] = useState<TransactionType>('expense')
@@ -46,6 +34,23 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
   const [category, setCategory] = useState<BudgetCategory>('Food & Dining')
   const [note, setNote] = useState('')
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (editingTransaction) {
+      setName(editingTransaction.name || '')
+      setType(editingTransaction.type || 'expense')
+      setAmount(editingTransaction.amount ? String(editingTransaction.amount) : '')
+      setCategory(editingTransaction.category || categories[0]?.name || 'Food & Dining')
+      setNote(editingTransaction.note || '')
+    } else {
+      setName('')
+      setType('expense')
+      setAmount('')
+      setCategory(categories[0]?.name || 'Food & Dining')
+      setNote('')
+    }
+    setError('')
+  }, [editingTransaction, isOpen, categories])
 
   if (!isOpen) return null
 
@@ -61,21 +66,32 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
       return
     }
 
-    onAddTransaction({
-      name: name.trim(),
-      type,
-      amount: parsedAmount,
-      category,
-      date: 'Today',
-      note: note.trim() || undefined,
-      createdAt: new Date().toISOString(),
-    })
+    if (editingTransaction && onUpdateTransaction) {
+      onUpdateTransaction({
+        ...editingTransaction,
+        name: name.trim(),
+        type,
+        amount: parsedAmount,
+        category,
+        note: note.trim() || undefined,
+      })
+    } else {
+      onAddTransaction({
+        name: name.trim(),
+        type,
+        amount: parsedAmount,
+        category,
+        date: 'Today',
+        note: note.trim() || undefined,
+        createdAt: new Date().toISOString(),
+      })
+    }
 
     // Reset & close
     setName('')
     setType('expense')
     setAmount('')
-    setCategory('Food & Dining')
+    setCategory(categories[0]?.name || 'Food & Dining')
     setNote('')
     setError('')
     onClose()
@@ -106,10 +122,10 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
           {/* Title & Subtitle */}
           <div className="mb-3.5">
             <h2 className="text-xl font-black text-black tracking-tight leading-tight">
-              Add Transaction
+              {editingTransaction ? 'Edit Transaction' : 'Add Transaction'}
             </h2>
             <p className="text-xs font-semibold text-black/60 mt-0.5">
-              Record your income or expense.
+              {editingTransaction ? 'Update transaction details.' : 'Record your income or expense.'}
             </p>
           </div>
 
@@ -185,19 +201,31 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
 
             {/* Category Grid */}
             <div>
-              <label className="block text-[12px] font-black text-black mb-1">
-                Category
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[12px] font-black text-black">
+                  Category
+                </label>
+                {onManageCategories && (
+                  <button
+                    type="button"
+                    onClick={onManageCategories}
+                    className="text-[10px] font-black text-black/70 hover:text-black underline cursor-pointer"
+                  >
+                    Manage
+                  </button>
+                )}
+              </div>
               <div className="grid grid-cols-4 gap-1.5 max-h-28 overflow-y-auto no-scrollbar p-0.5">
-                {CATEGORIES.map((cat) => {
-                  const isSelected = category === cat.category
-                  const bgColor = CATEGORY_COLORS[cat.category] || '#E2E8F0'
+                {categories.map((cat) => {
+                  const isSelected = category === cat.name
+                  const bgColor = cat.color || CATEGORY_COLORS[cat.name] || '#E2E8F0'
+                  const IconComp = getCategoryIconComponent(cat.iconName)
 
                   return (
                     <button
-                      key={cat.category}
+                      key={cat.id || cat.name}
                       type="button"
-                      onClick={() => setCategory(cat.category)}
+                      onClick={() => setCategory(cat.name)}
                       className={`relative flex flex-col items-center justify-center p-1.5 rounded-xl neo-border cursor-pointer transition-all ${
                         isSelected
                           ? 'neo-shadow-sm font-black ring-2 ring-black'
@@ -207,9 +235,9 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                         backgroundColor: isSelected ? bgColor : '#FFFFFF',
                       }}
                     >
-                      {cat.icon}
+                      <IconComp className="w-4 h-4 stroke-[2.4] text-black" />
                       <span className="text-[9px] font-bold text-black mt-1 text-center truncate w-full">
-                        {cat.category.split(' ')[0]}
+                        {cat.name.split(' ')[0]}
                       </span>
                     </button>
                   )
@@ -236,7 +264,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
               </div>
             </div>
 
-            {/* Add Transaction Button */}
+            {/* Submit Button */}
             <motion.button
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
@@ -247,7 +275,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
                 <Check className="w-3.5 h-3.5 text-black stroke-[3.5]" />
               </div>
               <span className="text-xs font-black uppercase tracking-wider text-black">
-                Add Transaction
+                {editingTransaction ? 'Save Changes' : 'Add Transaction'}
               </span>
             </motion.button>
           </form>

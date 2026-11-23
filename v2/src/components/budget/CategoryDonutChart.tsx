@@ -2,20 +2,23 @@ import React, { useState } from 'react'
 import { BudgetCategory } from '../../types/budget'
 import { CATEGORY_COLORS } from '../../constants/initialTransactions'
 
-interface CategoryBreakdownItem {
+export interface CategoryBreakdownItem {
   category: BudgetCategory
   amount: number
   percentage: number
+  color?: string
 }
 
 interface CategoryDonutChartProps {
   categoryBreakdown: CategoryBreakdownItem[]
   totalExpenses: number
+  onManageCategories?: () => void
 }
 
 export const CategoryDonutChart: React.FC<CategoryDonutChartProps> = ({
   categoryBreakdown,
   totalExpenses,
+  onManageCategories,
 }) => {
   const [hoveredCategory, setHoveredCategory] = useState<BudgetCategory | null>(
     null
@@ -33,7 +36,7 @@ export const CategoryDonutChart: React.FC<CategoryDonutChartProps> = ({
     accumulatedPercent += item.percentage
     return {
       ...item,
-      color: CATEGORY_COLORS[item.category] || '#E2E8F0',
+      color: item.color || CATEGORY_COLORS[item.category] || '#E2E8F0',
       strokeDasharray,
       strokeDashoffset,
     }
@@ -49,9 +52,21 @@ export const CategoryDonutChart: React.FC<CategoryDonutChartProps> = ({
         <h3 className="text-xs font-black uppercase tracking-wider text-black">
           Spending by Category
         </h3>
-        <span className="text-[11px] font-bold text-black/60">
-          8 Categories
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-bold text-black/60">
+            {categoryBreakdown.length} Categories
+          </span>
+          {onManageCategories && (
+            <button
+              type="button"
+              onClick={onManageCategories}
+              className="px-2 py-0.5 rounded-lg bg-[#FDE047] neo-border text-[10px] font-black text-black hover:opacity-90 cursor-pointer neo-pressable"
+              title="Manage Categories"
+            >
+              Edit
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
@@ -148,7 +163,7 @@ export const CategoryDonutChart: React.FC<CategoryDonutChartProps> = ({
         <div className="flex-1 grid grid-cols-1 gap-1 min-w-0 max-h-32 overflow-y-auto no-scrollbar pr-0.5">
           {categoryBreakdown.map((item) => {
             const isHovered = hoveredCategory === item.category
-            const color = CATEGORY_COLORS[item.category] || '#E2E8F0'
+            const color = item.color || CATEGORY_COLORS[item.category] || '#E2E8F0'
 
             return (
               <div

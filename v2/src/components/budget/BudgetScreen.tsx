@@ -1,57 +1,121 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Plus,
   TrendingUp,
   TrendingDown,
   PiggyBank,
   ChevronRight,
-  ChevronLeft,
   Calendar,
-  Utensils,
-  Car,
-  ShoppingBag,
-  Zap,
-  HeartPulse,
-  Film,
-  Repeat,
-  CircleDot,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { Transaction, BudgetCategory } from '../../types/budget'
+import { Transaction, BudgetCategory, CategoryItem } from '../../types/budget'
 import { CategoryDonutChart } from './CategoryDonutChart'
 import { AddTransactionModal } from './AddTransactionModal'
 import { TransactionDetailModal } from './TransactionDetailModal'
-import { CATEGORY_COLORS } from '../../constants/initialTransactions'
+import { ManageCategoriesModal } from './ManageCategoriesModal'
+import { CATEGORY_COLORS, INITIAL_CATEGORIES } from '../../constants/initialTransactions'
+import { getCategoryIconComponent } from '../../constants/icons'
 
 interface BudgetScreenProps {
   transactions: Transaction[]
   onAddTransaction: (transaction: Omit<Transaction, 'id'>) => void
+  onUpdateTransaction: (transaction: Transaction) => void
   onDeleteTransaction: (id: string) => void
   onNotify: (msg: string) => void
   onOpenProfile?: () => void
 }
 
-const ALL_CATEGORIES: BudgetCategory[] = [
-  'Food & Dining',
-  'Transport',
-  'Shopping',
-  'Utilities',
-  'Health',
-  'Entertainment',
-  'Subscriptions',
-  'Others',
-]
-
 export const BudgetScreen: React.FC<BudgetScreenProps> = ({
   transactions,
   onAddTransaction,
+  onUpdateTransaction,
   onDeleteTransaction,
   onNotify,
   onOpenProfile,
 }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
+  const [isManageCategoriesOpen, setIsManageCategoriesOpen] = useState(false)
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null)
+
+  // Dynamic Categories with localStorage persistence
+  const [categories, setCategories] = useState<CategoryItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('neo_budget_categories_v2')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      }
+    } catch (e) {
+      console.error('Failed to load categories', e)
+    }
+    return INITIAL_CATEGORIES
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('neo_budget_categories_v2', JSON.stringify(categories))
+    } catch (e) {
+      console.error('Failed to save categories', e)
+    }
+  }, [categories])
+
+  const handleAddCategory = (newCatData: Omit<CategoryItem, 'id'>) => {
+    const newCat: CategoryItem = {
+      ...newCatData,
+      id: `cat-${Date.now()}`,
+    }
+    setCategories((prev) => [...prev, newCat])
+    onNotify(`Created category "${newCat.name}"!`)
+  }
+
+  const handleUpdateCategory = (oldCat: CategoryItem, updatedCat: CategoryItem) => {
+    setCategories((prev) =>
+      prev.map((c) => (c.id === oldCat.id ? updatedCat : c))
+    )
+    if (oldCat.name !== updatedCat.name) {
+      transactions.forEach((tx) => {
+        if (tx.category === oldCat.name) {
+          onUpdateTransaction({
+            ...tx,
+            category: updatedCat.name,
+          })
+        }
+      })
+    }
+    onNotify(`Updated category "${updatedCat.name}"!`)
+  }
+
+  const handleDeleteCategory = (catToDelete: CategoryItem) => {
+    const remaining = categories.filter((c) => c.id !== catToDelete.id)
+    setCategories(remaining)
+    const fallbackCategory = remaining[0]?.name || 'Others'
+    transactions.forEach((tx) => {
+      if (tx.category === catToDelete.name) {
+        onUpdateTransaction({
+          ...tx,
+          category: fallbackCategory,
+        })
+      }
+    })
+    onNotify(`Deleted category "${catToDelete.name}".`)
+  }
+
+  const getCategoryColor = (catName: string) => {
+    const found = categories.find(
+      (c) => c.name.toLowerCase() === catName.toLowerCase()
+    )
+    return found?.color || CATEGORY_COLORS[catName] || '#E2E8F0'
+  }
+
+  const getCategoryIcon = (catName: string) => {
+    const found = categories.find(
+      (c) => c.name.toLowerCase() === catName.toLowerCase()
+    )
+    const IconComp = getCategoryIconComponent(found?.iconName || catName.toLowerCase())
+    return <IconComp className="w-4 h-4 stroke-[2.4]" />
+  }
 
   // Calculations
   const monthlyBudget = 40000 // ₹40,000 monthly spending budget
@@ -75,12 +139,12 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
   )
 
   // Calculate Category Breakdown for Donut Chart
-  const categoryTotals: Record<BudgetCategory, number> = ALL_CATEGORIES.reduce(
+  const categoryTotals: Record<string, number> = categories.reduce(
     (acc, cat) => {
-      acc[cat] = 0
+      acc[cat.name] = 0
       return acc
     },
-    {} as Record<BudgetCategory, number>
+    {} as Record<string, number>
   )
 
   transactions
@@ -89,37 +153,17 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
       categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount
     })
 
-  const categoryBreakdown = ALL_CATEGORIES.map((cat) => {
-    const amount = categoryTotals[cat] || 0
+  const categoryBreakdown = categories.map((cat) => {
+    const amount = categoryTotals[cat.name] || 0
     const percentage =
       totalExpenses > 0 ? Math.round((amount / totalExpenses) * 100) : 0
     return {
-      category: cat,
+      category: cat.name,
       amount,
       percentage,
+      color: cat.color,
     }
   }).sort((a, b) => b.amount - a.amount)
-
-  const getCategoryIcon = (category: BudgetCategory) => {
-    switch (category) {
-      case 'Food & Dining':
-        return <Utensils className="w-4 h-4 stroke-[2.4]" />
-      case 'Transport':
-        return <Car className="w-4 h-4 stroke-[2.4]" />
-      case 'Shopping':
-        return <ShoppingBag className="w-4 h-4 stroke-[2.4]" />
-      case 'Utilities':
-        return <Zap className="w-4 h-4 stroke-[2.4]" />
-      case 'Health':
-        return <HeartPulse className="w-4 h-4 stroke-[2.4]" />
-      case 'Entertainment':
-        return <Film className="w-4 h-4 stroke-[2.4]" />
-      case 'Subscriptions':
-        return <Repeat className="w-4 h-4 stroke-[2.4]" />
-      default:
-        return <CircleDot className="w-4 h-4 stroke-[2.4]" />
-    }
-  }
 
   return (
     <div className="flex flex-col h-full justify-between overflow-hidden select-none">
@@ -235,6 +279,7 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
         <CategoryDonutChart
           categoryBreakdown={categoryBreakdown}
           totalExpenses={totalExpenses}
+          onManageCategories={() => setIsManageCategoriesOpen(true)}
         />
 
         {/* Recent Transactions List */}
@@ -249,7 +294,7 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
 
         {transactions.map((tx) => {
           const isExpense = tx.type === 'expense'
-          const catColor = CATEGORY_COLORS[tx.category] || '#E2E8F0'
+          const catColor = getCategoryColor(tx.category)
 
           return (
             <motion.div
@@ -295,24 +340,54 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
         })}
       </div>
 
-      {/* Add Transaction Modal */}
+      {/* Add / Edit Transaction Modal */}
       <AddTransactionModal
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        editingTransaction={editingTransaction}
+        categories={categories}
+        onClose={() => {
+          setIsAddModalOpen(false)
+          setEditingTransaction(null)
+        }}
         onAddTransaction={(tx) => {
           onAddTransaction(tx)
           onNotify(`Recorded ₹${tx.amount} for "${tx.name}"!`)
         }}
+        onUpdateTransaction={(tx) => {
+          onUpdateTransaction(tx)
+          onNotify(`Updated "${tx.name}"!`)
+        }}
+        onManageCategories={() => setIsManageCategoriesOpen(true)}
       />
 
       {/* Transaction Detail Modal */}
       <TransactionDetailModal
         transaction={selectedTransaction}
+        categoryColor={
+          selectedTransaction
+            ? getCategoryColor(selectedTransaction.category)
+            : undefined
+        }
         onClose={() => setSelectedTransaction(null)}
+        onEdit={(tx) => {
+          setSelectedTransaction(null)
+          setEditingTransaction(tx)
+          setIsAddModalOpen(true)
+        }}
         onDelete={(id) => {
           onDeleteTransaction(id)
           onNotify('Transaction deleted.')
         }}
+      />
+
+      {/* Manage Categories Modal */}
+      <ManageCategoriesModal
+        isOpen={isManageCategoriesOpen}
+        onClose={() => setIsManageCategoriesOpen(false)}
+        categories={categories}
+        onAddCategory={handleAddCategory}
+        onUpdateCategory={handleUpdateCategory}
+        onDeleteCategory={handleDeleteCategory}
       />
     </div>
   )

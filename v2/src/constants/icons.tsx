@@ -45,6 +45,25 @@ import {
   Mountain,
   Camera,
   Sparkles,
+  Car,
+  ShoppingBag,
+  Zap,
+  Repeat,
+  CircleDot,
+  HeartPulse,
+  Wallet,
+  CreditCard,
+  Tag,
+  Home,
+  Plane,
+  Bus,
+  Gift,
+  GraduationCap,
+  Fuel,
+  Wifi,
+  DollarSign,
+  Smile,
+  Package,
 } from 'lucide-react'
 
 // Custom Meditation SVG Icon matching the original reference
@@ -186,4 +205,58 @@ export function getHabitIconComponent(iconName: string): React.ComponentType<{ c
   if (iconName === 'laptop') return Laptop
   if (iconName === 'users') return Users
   return Dumbbell
+}
+
+export interface CategoryIconChoice {
+  id: string
+  label: string
+  component: React.ComponentType<{ className?: string }>
+}
+
+export const CATEGORY_ICON_CHOICES: CategoryIconChoice[] = [
+  { id: 'utensils', label: 'Dining', component: Utensils },
+  { id: 'coffee', label: 'Coffee', component: Coffee },
+  { id: 'car', label: 'Car', component: Car },
+  { id: 'bus', label: 'Transit', component: Bus },
+  { id: 'plane', label: 'Travel', component: Plane },
+  { id: 'fuel', label: 'Fuel', component: Fuel },
+  { id: 'shopping-bag', label: 'Shopping', component: ShoppingBag },
+  { id: 'package', label: 'Orders', component: Package },
+  { id: 'zap', label: 'Utilities', component: Zap },
+  { id: 'wifi', label: 'Internet', component: Wifi },
+  { id: 'home', label: 'Home', component: Home },
+  { id: 'heart', label: 'Health', component: Heart },
+  { id: 'heart-pulse', label: 'Medical', component: HeartPulse },
+  { id: 'film', label: 'Movies', component: Film },
+  { id: 'repeat', label: 'Subs', component: Repeat },
+  { id: 'wallet', label: 'Wallet', component: Wallet },
+  { id: 'credit-card', label: 'Cards', component: CreditCard },
+  { id: 'dollar-sign', label: 'Money', component: DollarSign },
+  { id: 'beer', label: 'Drinks', component: Beer },
+  { id: 'gift', label: 'Gifts', component: Gift },
+  { id: 'book', label: 'Education', component: BookOpen },
+  { id: 'briefcase', label: 'Business', component: Briefcase },
+  { id: 'dumbbell', label: 'Fitness', component: Dumbbell },
+  { id: 'laptop', label: 'Tech', component: Laptop },
+  { id: 'gamepad', label: 'Gaming', component: Gamepad2 },
+  { id: 'music', label: 'Music', component: Music },
+  { id: 'tag', label: 'Tag', component: Tag },
+  { id: 'circle-dot', label: 'Other', component: CircleDot },
+]
+
+export function getCategoryIconComponent(iconName: string): React.ComponentType<{ className?: string }> {
+  const found = CATEGORY_ICON_CHOICES.find((i) => i.id === iconName)
+  if (found) return found.component
+
+  // Fallback checks
+  if (iconName === 'utensils') return Utensils
+  if (iconName === 'car') return Car
+  if (iconName === 'shopping-bag') return ShoppingBag
+  if (iconName === 'zap') return Zap
+  if (iconName === 'heart' || iconName === 'heart-pulse') return HeartPulse
+  if (iconName === 'film') return Film
+  if (iconName === 'repeat') return Repeat
+  if (iconName === 'coffee') return Coffee
+  if (iconName === 'wallet') return Wallet
+  return CircleDot
 }

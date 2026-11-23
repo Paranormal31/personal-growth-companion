@@ -20,6 +20,7 @@ import { WorkoutDetailModal } from './WorkoutDetailModal'
 interface GymScreenProps {
   workouts: Workout[]
   onAddWorkout: (workout: Omit<Workout, 'id'>) => void
+  onUpdateWorkout: (workout: Workout) => void
   onDeleteWorkout: (id: string) => void
   onNotify: (msg: string) => void
   onOpenProfile?: () => void
@@ -28,11 +29,13 @@ interface GymScreenProps {
 export const GymScreen: React.FC<GymScreenProps> = ({
   workouts,
   onAddWorkout,
+  onUpdateWorkout,
   onDeleteWorkout,
   onNotify,
   onOpenProfile,
 }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null)
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null)
   const [isWorkoutStarted, setIsWorkoutStarted] = useState(false)
 
@@ -265,14 +268,22 @@ export const GymScreen: React.FC<GymScreenProps> = ({
         ))}
       </div>
 
-      {/* Add Workout Modal */}
+      {/* Add / Edit Workout Modal */}
       <AddWorkoutModal
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        editingWorkout={editingWorkout}
+        onClose={() => {
+          setIsAddModalOpen(false)
+          setEditingWorkout(null)
+        }}
         onAddWorkout={(data) => {
           onAddWorkout(data)
           setIsWorkoutStarted(false)
           onNotify(`Logged "${data.name}" successfully! 💪`)
+        }}
+        onUpdateWorkout={(workout) => {
+          onUpdateWorkout(workout)
+          onNotify(`Updated "${workout.name}"! 💪`)
         }}
       />
 
@@ -280,6 +291,11 @@ export const GymScreen: React.FC<GymScreenProps> = ({
       <WorkoutDetailModal
         workout={selectedWorkout}
         onClose={() => setSelectedWorkout(null)}
+        onEdit={(workout) => {
+          setSelectedWorkout(null)
+          setEditingWorkout(workout)
+          setIsAddModalOpen(true)
+        }}
         onDelete={(id) => {
           onDeleteWorkout(id)
           onNotify('Workout removed.')

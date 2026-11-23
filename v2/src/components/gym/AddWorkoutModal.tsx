@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
@@ -18,6 +18,8 @@ interface AddWorkoutModalProps {
   isOpen: boolean
   onClose: () => void
   onAddWorkout: (workout: Omit<Workout, 'id'>) => void
+  editingWorkout?: Workout | null
+  onUpdateWorkout?: (workout: Workout) => void
 }
 
 const DURATION_OPTIONS = [
@@ -33,6 +35,8 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({
   isOpen,
   onClose,
   onAddWorkout,
+  editingWorkout,
+  onUpdateWorkout,
 }) => {
   const [name, setName] = useState('')
   const [type, setType] = useState<WorkoutType>('Strength')
@@ -40,6 +44,25 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({
   const [calories, setCalories] = useState('')
   const [notes, setNotes] = useState('')
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (editingWorkout) {
+      setName(editingWorkout.name || '')
+      setType(editingWorkout.type || 'Strength')
+      setDuration(editingWorkout.duration || '45 min')
+      setCalories(
+        editingWorkout.calories !== undefined ? String(editingWorkout.calories) : ''
+      )
+      setNotes(editingWorkout.notes || '')
+    } else {
+      setName('')
+      setType('Strength')
+      setDuration('45 min')
+      setCalories('')
+      setNotes('')
+    }
+    setError('')
+  }, [editingWorkout, isOpen])
 
   if (!isOpen) return null
 
@@ -50,15 +73,26 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({
       return
     }
 
-    onAddWorkout({
-      name: name.trim(),
-      type,
-      date: 'Today',
-      duration,
-      calories: calories ? parseInt(calories, 10) : undefined,
-      notes: notes.trim() || undefined,
-      completedAt: new Date().toISOString(),
-    })
+    if (editingWorkout && onUpdateWorkout) {
+      onUpdateWorkout({
+        ...editingWorkout,
+        name: name.trim(),
+        type,
+        duration,
+        calories: calories ? parseInt(calories, 10) : undefined,
+        notes: notes.trim() || undefined,
+      })
+    } else {
+      onAddWorkout({
+        name: name.trim(),
+        type,
+        date: 'Today',
+        duration,
+        calories: calories ? parseInt(calories, 10) : undefined,
+        notes: notes.trim() || undefined,
+        completedAt: new Date().toISOString(),
+      })
+    }
 
     // Reset form
     setName('')
@@ -118,10 +152,10 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({
           {/* Title & Subtitle */}
           <div className="mb-4">
             <h2 className="text-xl font-black text-black tracking-tight leading-tight">
-              Add Workout
+              {editingWorkout ? 'Edit Workout' : 'Add Workout'}
             </h2>
             <p className="text-xs font-semibold text-black/60 mt-0.5">
-              Log a new workout session.
+              {editingWorkout ? 'Update workout details.' : 'Log a new workout session.'}
             </p>
           </div>
 
@@ -263,7 +297,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({
                 <Check className="w-3.5 h-3.5 text-black stroke-[3.5]" />
               </div>
               <span className="text-sm font-black text-black tracking-wide">
-                Save Workout
+                {editingWorkout ? 'Save Changes' : 'Save Workout'}
               </span>
             </motion.button>
           </form>

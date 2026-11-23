@@ -407,6 +407,12 @@ export const App: React.FC = () => {
     triggerCelebration()
   }
 
+  const handleUpdateWorkout = (updatedWorkout: Workout) => {
+    setWorkouts((prev) =>
+      prev.map((w) => (w.id === updatedWorkout.id ? updatedWorkout : w))
+    )
+  }
+
   const handleDeleteWorkout = (id: string) => {
     setWorkouts((prev) => prev.filter((w) => w.id !== id))
   }
@@ -419,6 +425,12 @@ export const App: React.FC = () => {
     }
     setTransactions((prev) => [newTx, ...prev])
     triggerCelebration()
+  }
+
+  const handleUpdateTransaction = (updatedTx: Transaction) => {
+    setTransactions((prev) =>
+      prev.map((t) => (t.id === updatedTx.id ? updatedTx : t))
+    )
   }
 
   const handleDeleteTransaction = (id: string) => {
@@ -511,6 +523,7 @@ export const App: React.FC = () => {
             <GymScreen
               workouts={workouts}
               onAddWorkout={handleAddWorkout}
+              onUpdateWorkout={handleUpdateWorkout}
               onDeleteWorkout={handleDeleteWorkout}
               onNotify={(msg) => setToastMessage(msg)}
               onOpenProfile={() => setActiveTab('profile')}
@@ -549,6 +562,7 @@ export const App: React.FC = () => {
             <BudgetScreen
               transactions={transactions}
               onAddTransaction={handleAddTransaction}
+              onUpdateTransaction={handleUpdateTransaction}
               onDeleteTransaction={handleDeleteTransaction}
               onNotify={(msg) => setToastMessage(msg)}
               onOpenProfile={() => setActiveTab('profile')}

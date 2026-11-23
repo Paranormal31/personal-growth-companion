@@ -1,18 +1,20 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Dumbbell, Footprints, Flower2, Zap, Clock, Flame, Calendar, Trash2 } from 'lucide-react'
+import { X, Dumbbell, Footprints, Flower2, Zap, Clock, Flame, Calendar, Trash2, Pencil } from 'lucide-react'
 import { Workout } from '../../types/workout'
 
 interface WorkoutDetailModalProps {
   workout: Workout | null
   onClose: () => void
   onDelete?: (id: string) => void
+  onEdit?: (workout: Workout) => void
 }
 
 export const WorkoutDetailModal: React.FC<WorkoutDetailModalProps> = ({
   workout,
   onClose,
   onDelete,
+  onEdit,
 }) => {
   if (!workout) return null
 
@@ -132,6 +134,18 @@ export const WorkoutDetailModal: React.FC<WorkoutDetailModalProps> = ({
 
           {/* Action Row */}
           <div className="flex items-center gap-2">
+            {onEdit && (
+              <button
+                onClick={() => {
+                  onEdit(workout)
+                  onClose()
+                }}
+                className="px-3 py-2.5 bg-[#FFD027] neo-border rounded-xl flex items-center justify-center text-black font-bold text-xs neo-pressable cursor-pointer"
+                title="Edit workout"
+              >
+                <Pencil className="w-4 h-4 stroke-[2.4]" />
+              </button>
+            )}
             {onDelete && (
               <button
                 onClick={() => {
