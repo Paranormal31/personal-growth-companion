@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Flame,
   Target,
@@ -10,10 +10,14 @@ import {
   LogOut,
   ChevronRight,
   Sprout,
+  Pencil,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { ProfileAvatar } from './ProfileAvatar'
 import { ProfileModal, ProfileModalType } from './ProfileModal'
+import { EditProfileModal } from './EditProfileModal'
+import { UserProfile } from '../../types/avatar'
+import { DEFAULT_USER_PROFILE } from '../../utils/avatarGenerator'
 
 interface ProfileScreenProps {
   onNotify: (msg: string) => void
@@ -37,6 +41,25 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   totalExpenses = 0,
 }) => {
   const [activeModal, setActiveModal] = useState<ProfileModalType | null>(null)
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
+
+  // User Profile with localStorage persistence (starts at 'User' by default)
+  const [userProfile, setUserProfile] = useState<UserProfile>(() => {
+    try {
+      const saved = localStorage.getItem('neo_user_profile_v3')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (parsed && typeof parsed.name === 'string') return parsed
+      }
+    } catch {}
+    return DEFAULT_USER_PROFILE
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('neo_user_profile_v3', JSON.stringify(userProfile))
+    } catch {}
+  }, [userProfile])
 
   const menuItems: {
     id: ProfileModalType
@@ -104,24 +127,25 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         <motion.div
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
-          onClick={() => setActiveModal('preferences')}
+          onClick={() => setIsEditProfileOpen(true)}
           className="w-full bg-[#DDD6FE] neo-border neo-shadow rounded-3xl p-3 mb-2 flex items-center justify-between cursor-pointer neo-pressable"
+          title="Click to edit name and avatar"
         >
-          <div className="flex items-center gap-3">
-            <ProfileAvatar />
-            <div>
-              <h2 className="text-base font-black text-black tracking-tight leading-tight">
-                Sarthak Naulakha
+          <div className="flex items-center gap-3 min-w-0">
+            <ProfileAvatar config={userProfile.avatarConfig} />
+            <div className="min-w-0">
+              <h2 className="text-base font-black text-black tracking-tight leading-tight truncate">
+                {userProfile.name}
               </h2>
-              <div className="flex items-center gap-1 text-xs font-bold text-black/80 mt-0.5">
-                <Sprout className="w-3.5 h-3.5 text-[#16A34A] stroke-[2.5]" />
-                <span>Personal Growth Journey</span>
+              <div className="flex items-center gap-1 text-xs font-bold text-black/80 mt-0.5 truncate">
+                <Sprout className="w-3.5 h-3.5 text-[#16A34A] stroke-[2.5] shrink-0" />
+                <span className="truncate">{userProfile.tagline}</span>
               </div>
             </div>
           </div>
 
-          <div className="w-7 h-7 flex items-center justify-center text-black">
-            <ChevronRight className="w-5 h-5 stroke-[2.6]" />
+          <div className="w-8 h-8 rounded-xl neo-border bg-white flex items-center justify-center text-black shadow-xs shrink-0">
+            <Pencil className="w-3.5 h-3.5 stroke-[2.6]" />
           </div>
         </motion.div>
 
@@ -220,8 +244,17 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         monthlyBudget={monthlyBudget}
         totalExpenses={totalExpenses}
         onConfirmLogout={() => {
-          onNotify('👋 See you next time, Sarthak!')
+          onNotify(`👋 See you next time, ${userProfile.name}!`)
         }}
+      />
+
+      {/* Edit Profile & Avataaars Customizer Modal */}
+      <EditProfileModal
+        isOpen={isEditProfileOpen}
+        onClose={() => setIsEditProfileOpen(false)}
+        currentProfile={userProfile}
+        onSaveProfile={setUserProfile}
+        onNotify={onNotify}
       />
     </div>
   )

@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dicebear/collection": "^9.4.2",
+    "@dicebear/core": "^9.4.3",
     "@tailwindcss/vite": "^4.0.0",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
