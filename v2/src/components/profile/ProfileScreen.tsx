@@ -21,6 +21,9 @@ interface ProfileScreenProps {
   currentStreakDays?: number
   completionPercentage?: number
   totalHabitsCount?: number
+  totalWorkouts?: number
+  monthlyBudget?: number
+  totalExpenses?: number
 }
 
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
@@ -29,6 +32,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   currentStreakDays = 0,
   completionPercentage = 0,
   totalHabitsCount = 0,
+  totalWorkouts = 0,
+  monthlyBudget = 40000,
+  totalExpenses = 0,
 }) => {
   const [activeModal, setActiveModal] = useState<ProfileModalType | null>(null)
 
@@ -92,9 +98,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           <h1 className="text-[28px] sm:text-[32px] font-black text-black leading-none tracking-tight">
             Profile<span className="text-[#FDE047]">.</span>
           </h1>
-          <p className="text-[13px] font-bold text-black/80 mt-1">
-            Your space, your progress.
-          </p>
         </header>
 
         {/* User Card */}
@@ -211,6 +214,11 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         onClose={() => setActiveModal(null)}
         onResetAllData={onResetAllData}
         onNotify={onNotify}
+        currentStreakDays={currentStreakDays}
+        completionPercentage={completionPercentage}
+        totalWorkouts={totalWorkouts}
+        monthlyBudget={monthlyBudget}
+        totalExpenses={totalExpenses}
         onConfirmLogout={() => {
           onNotify('👋 See you next time, Sarthak!')
         }}

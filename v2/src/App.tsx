@@ -206,6 +206,42 @@ export const App: React.FC = () => {
     }
   }, [transactions])
 
+  // 4. Shared weekly gym target persistence in localStorage (starts at 0 as requested)
+  const [weeklyTarget, setWeeklyTarget] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('neo_gym_weekly_target_v3')
+      if (saved !== null) {
+        const parsed = parseInt(saved, 10)
+        if (!isNaN(parsed) && parsed >= 0) return parsed
+      }
+    } catch {}
+    return 0
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('neo_gym_weekly_target_v3', String(weeklyTarget))
+    } catch {}
+  }, [weeklyTarget])
+
+  // 5. Shared monthly budget limit persistence in localStorage
+  const [monthlyBudget, setMonthlyBudget] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('neo_monthly_budget_v3')
+      if (saved !== null) {
+        const parsed = parseInt(saved, 10)
+        if (!isNaN(parsed) && parsed > 0) return parsed
+      }
+    } catch {}
+    return 40000
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('neo_monthly_budget_v3', String(monthlyBudget))
+    } catch {}
+  }, [monthlyBudget])
+
   // Auto-dismiss toast
   useEffect(() => {
     if (toastMessage) {
@@ -545,6 +581,8 @@ export const App: React.FC = () => {
               onDeleteWorkout={handleDeleteWorkout}
               onNotify={(msg) => setToastMessage(msg)}
               onOpenProfile={() => setActiveTab('profile')}
+              weeklyTarget={weeklyTarget}
+              onUpdateWeeklyTarget={setWeeklyTarget}
             />
           </div>
           <div className="shrink-0">
@@ -565,6 +603,8 @@ export const App: React.FC = () => {
               onNavigateTab={(tab) => setActiveTab(tab)}
               onOpenProfile={() => setActiveTab('profile')}
               onNotify={(msg) => setToastMessage(msg)}
+              weeklyWorkoutTarget={weeklyTarget}
+              monthlyBudget={monthlyBudget}
             />
           </div>
           <div className="shrink-0">
@@ -584,6 +624,8 @@ export const App: React.FC = () => {
               onDeleteTransaction={handleDeleteTransaction}
               onNotify={(msg) => setToastMessage(msg)}
               onOpenProfile={() => setActiveTab('profile')}
+              monthlyBudget={monthlyBudget}
+              onUpdateMonthlyBudget={setMonthlyBudget}
             />
           </div>
           <div className="shrink-0">
@@ -602,6 +644,11 @@ export const App: React.FC = () => {
               currentStreakDays={currentStreakDays}
               completionPercentage={completionPercentage}
               totalHabitsCount={habits.length}
+              totalWorkouts={workouts.length}
+              monthlyBudget={monthlyBudget}
+              totalExpenses={transactions
+                .filter((t) => t.type === 'expense')
+                .reduce((acc, t) => acc + t.amount, 0)}
             />
           </div>
           <div className="shrink-0">

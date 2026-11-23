@@ -23,6 +23,8 @@ interface HomeScreenProps {
   onNavigateTab: (tab: 'habit' | 'gym' | 'home' | 'budget' | 'profile') => void
   onOpenProfile?: () => void
   onNotify: (msg: string) => void
+  weeklyWorkoutTarget?: number
+  monthlyBudget?: number
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
@@ -33,6 +35,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onNavigateTab,
   onOpenProfile,
   onNotify,
+  weeklyWorkoutTarget: propWeeklyWorkoutTarget,
+  monthlyBudget: propMonthlyBudget,
 }) => {
   // Time-based greeting
   const getGreeting = () => {
@@ -73,12 +77,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       : 0
 
   // 2. Gym / Workouts
-  const weeklyWorkoutTarget = 5
+  const weeklyWorkoutTarget = propWeeklyWorkoutTarget ?? 0
   const weeklyWorkoutsCount = workouts.length
   const latestWorkout = workouts[0] || null
 
   // 3. Budget / Transactions
-  const monthlyBudget = 40000
+  const monthlyBudget = propMonthlyBudget ?? 40000
   const monthlyIncome = transactions
     .filter((t) => t.type === 'income')
     .reduce((acc, t) => acc + t.amount, 0)
@@ -102,9 +106,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <h1 className="text-[26px] sm:text-[30px] font-black text-black leading-none tracking-tight">
                 {greeting.text}
               </h1>
-              <p className="text-[13px] font-bold text-black/80 mt-1 flex items-center gap-1">
-                Let's make today count! <Sparkles className="w-3.5 h-3.5 text-[#EAB308]" />
-              </p>
             </div>
 
             {/* Dynamic Time-of-Day Icon Tile */}

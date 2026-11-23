@@ -6,8 +6,11 @@ import {
   PiggyBank,
   ChevronRight,
   Calendar,
+  Pencil,
+  X,
+  Check,
 } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Transaction, BudgetCategory, CategoryItem } from '../../types/budget'
 import { CategoryDonutChart } from './CategoryDonutChart'
 import { AddTransactionModal } from './AddTransactionModal'
@@ -23,6 +26,8 @@ interface BudgetScreenProps {
   onDeleteTransaction: (id: string) => void
   onNotify: (msg: string) => void
   onOpenProfile?: () => void
+  monthlyBudget?: number
+  onUpdateMonthlyBudget?: (budget: number) => void
 }
 
 export const BudgetScreen: React.FC<BudgetScreenProps> = ({
@@ -32,12 +37,43 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
   onDeleteTransaction,
   onNotify,
   onOpenProfile,
+  monthlyBudget: propMonthlyBudget,
+  onUpdateMonthlyBudget,
 }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [isManageCategoriesOpen, setIsManageCategoriesOpen] = useState(false)
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null)
+  const [isEditBudgetOpen, setIsEditBudgetOpen] = useState(false)
+
+  // Monthly Budget with prop sync and localStorage persistence
+  const [monthlyBudget, setMonthlyBudget] = useState<number>(() => {
+    if (propMonthlyBudget !== undefined) return propMonthlyBudget
+    try {
+      const saved = localStorage.getItem('neo_monthly_budget_v3')
+      if (saved !== null) {
+        const parsed = parseInt(saved, 10)
+        if (!isNaN(parsed) && parsed > 0) return parsed
+      }
+    } catch {}
+    return 40000
+  })
+
+  const [budgetInput, setBudgetInput] = useState<number>(monthlyBudget)
+
+  useEffect(() => {
+    if (propMonthlyBudget !== undefined) {
+      setMonthlyBudget(propMonthlyBudget)
+      setBudgetInput(propMonthlyBudget)
+    }
+  }, [propMonthlyBudget])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('neo_monthly_budget_v3', String(monthlyBudget))
+    } catch {}
+  }, [monthlyBudget])
 
   // Dynamic Categories with localStorage persistence
   const [categories, setCategories] = useState<CategoryItem[]>(() => {
@@ -118,8 +154,6 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
   }
 
   // Calculations
-  const monthlyBudget = 40000 // ₹40,000 monthly spending budget
-
   const totalIncome = transactions
     .filter((t) => t.type === 'income')
     .reduce((acc, t) => acc + t.amount, 0)
@@ -176,9 +210,6 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
               <h1 className="text-[26px] sm:text-[30px] font-black text-black leading-none tracking-tight">
                 Budget Tracker<span className="text-[#FDE047]">.</span>
               </h1>
-              <p className="text-[13px] font-bold text-black/80 mt-1">
-                Track spending, save smarter.
-              </p>
             </div>
 
             <motion.button
@@ -212,9 +243,18 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
               <span className="text-2xl font-black text-black tracking-tight leading-none">
                 ₹{totalExpenses.toLocaleString()}
               </span>
-              <span className="text-xs font-black text-black/60">
-                / ₹{monthlyBudget.toLocaleString()}
-              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setBudgetInput(monthlyBudget)
+                  setIsEditBudgetOpen(true)
+                }}
+                className="text-xs font-black text-black/60 hover:text-black flex items-center gap-1 cursor-pointer transition-colors p-0.5 rounded hover:bg-black/10"
+                title="Edit monthly budget"
+              >
+                <span>/ ₹{monthlyBudget.toLocaleString()}</span>
+                <Pencil className="w-2.5 h-2.5 stroke-[2.5]" />
+              </button>
             </div>
             <span className="text-xs font-black text-black/80">
               {budgetSpentPercent}% spent
@@ -401,6 +441,94 @@ export const BudgetScreen: React.FC<BudgetScreenProps> = ({
         onUpdateCategory={handleUpdateCategory}
         onDeleteCategory={handleDeleteCategory}
       />
+
+      {/* Edit Monthly Budget Modal */}
+      <AnimatePresence>
+        {isEditBudgetOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="relative w-full max-w-[320px] bg-[#FFFDF5] neo-border-thick neo-shadow-lg rounded-[28px] p-5 select-none"
+            >
+              <div className="w-12 h-1 bg-black/25 rounded-full mx-auto mb-3" />
+              <button
+                type="button"
+                onClick={() => setIsEditBudgetOpen(false)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-lg flex items-center justify-center text-black hover:bg-black/10 cursor-pointer"
+              >
+                <X className="w-5 h-5 stroke-[2.6]" />
+              </button>
+
+              <h3 className="text-lg font-black text-black">Monthly Budget</h3>
+              <p className="text-xs font-semibold text-black/60 mt-0.5 mb-3.5">
+                Set your spending limit for the month.
+              </p>
+
+              {/* Amount Input */}
+              <div className="relative mb-3">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-black text-black/60">
+                  ₹
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  step="500"
+                  value={budgetInput || ''}
+                  onChange={(e) =>
+                    setBudgetInput(Math.max(0, parseInt(e.target.value, 10) || 0))
+                  }
+                  placeholder="e.g. 40000"
+                  className="w-full pl-8 pr-4 py-2.5 bg-white neo-border rounded-xl font-black text-sm text-black focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+
+              {/* Quick Preset Buttons */}
+              <div className="grid grid-cols-4 gap-1.5 mb-4">
+                {[20000, 30000, 40000, 50000].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setBudgetInput(preset)}
+                    className={`py-1.5 rounded-lg neo-border font-black text-[10px] cursor-pointer transition-all ${
+                      budgetInput === preset
+                        ? 'bg-[#FDE047] neo-shadow-xs ring-1 ring-black'
+                        : 'bg-white hover:bg-black/5 text-black/75'
+                    }`}
+                  >
+                    ₹{(preset / 1000).toFixed(0)}k
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditBudgetOpen(false)}
+                  className="flex-1 py-2.5 bg-white neo-border rounded-xl text-xs font-black text-black hover:bg-black/5 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const finalBudget = budgetInput > 0 ? budgetInput : 40000
+                    setMonthlyBudget(finalBudget)
+                    if (onUpdateMonthlyBudget) onUpdateMonthlyBudget(finalBudget)
+                    setIsEditBudgetOpen(false)
+                    onNotify(`Monthly budget set to ₹${finalBudget.toLocaleString()}!`)
+                  }}
+                  className="flex-1 py-2.5 bg-[#D4F972] neo-border neo-shadow rounded-xl text-xs font-black text-black flex items-center justify-center gap-1.5 cursor-pointer neo-pressable"
+                >
+                  <Check className="w-4 h-4 stroke-[3]" />
+                  <span>Save</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

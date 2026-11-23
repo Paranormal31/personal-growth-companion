@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
@@ -12,6 +12,9 @@ import {
   Download,
   Upload,
   RotateCcw,
+  Pencil,
+  Trash2,
+  Plus,
 } from 'lucide-react'
 
 export type ProfileModalType =
@@ -23,12 +26,39 @@ export type ProfileModalType =
   | 'about'
   | 'logout'
 
+export interface GoalItem {
+  id: string
+  title: string
+  progress: number
+  color: string
+}
+
+const INITIAL_GOALS: GoalItem[] = [
+  { id: 'goal-1', title: 'Run 15km Every Week', progress: 0, color: '#D4F972' },
+  { id: 'goal-2', title: 'Read 20 Books in 2026', progress: 0, color: '#7DD3FC' },
+  { id: 'goal-3', title: 'Save ₹50,000 Emergency Fund', progress: 0, color: '#FDE047' },
+]
+
+const GOAL_COLORS = [
+  '#D4F972', // Lime
+  '#7DD3FC', // Sky
+  '#FDE047', // Yellow
+  '#F9A8D4', // Pink
+  '#DDD6FE', // Purple
+  '#FED7AA', // Peach
+]
+
 interface ProfileModalProps {
   type: ProfileModalType | null
   onClose: () => void
   onConfirmLogout?: () => void
   onResetAllData?: () => void
   onNotify: (msg: string) => void
+  currentStreakDays?: number
+  completionPercentage?: number
+  totalWorkouts?: number
+  monthlyBudget?: number
+  totalExpenses?: number
 }
 
 export const ProfileModal: React.FC<ProfileModalProps> = ({
@@ -37,55 +67,300 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   onConfirmLogout,
   onResetAllData,
   onNotify,
+  currentStreakDays = 0,
+  completionPercentage = 0,
+  totalWorkouts = 0,
+  monthlyBudget = 40000,
+  totalExpenses = 0,
 }) => {
+  // Goals state with localStorage persistence
+  const [goals, setGoals] = useState<GoalItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('neo_profile_goals_v3')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      }
+    } catch {}
+    return INITIAL_GOALS
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('neo_profile_goals_v3', JSON.stringify(goals))
+    } catch {}
+  }, [goals])
+
+  // State for Goal editing/adding
+  const [editingGoal, setEditingGoal] = useState<GoalItem | null>(null)
+  const [isAddingGoal, setIsAddingGoal] = useState(false)
+  const [goalTitle, setGoalTitle] = useState('')
+  const [goalProgress, setGoalProgress] = useState(0)
+  const [goalColor, setGoalColor] = useState(GOAL_COLORS[0])
+
+  const handleOpenAddGoal = () => {
+    setGoalTitle('')
+    setGoalProgress(0)
+    setGoalColor(GOAL_COLORS[Math.floor(Math.random() * GOAL_COLORS.length)])
+    setIsAddingGoal(true)
+    setEditingGoal(null)
+  }
+
+  const handleOpenEditGoal = (goal: GoalItem) => {
+    setGoalTitle(goal.title)
+    setGoalProgress(goal.progress)
+    setGoalColor(goal.color)
+    setEditingGoal(goal)
+    setIsAddingGoal(false)
+  }
+
+  const handleSaveGoal = () => {
+    if (!goalTitle.trim()) {
+      onNotify('Please enter a goal title!')
+      return
+    }
+
+    const clampedProgress = Math.min(100, Math.max(0, Number(goalProgress) || 0))
+
+    if (editingGoal) {
+      // Update existing goal
+      setGoals((prev) =>
+        prev.map((g) =>
+          g.id === editingGoal.id
+            ? { ...g, title: goalTitle.trim(), progress: clampedProgress, color: goalColor }
+            : g
+        )
+      )
+      onNotify(`Updated "${goalTitle.trim()}"!`)
+    } else {
+      // Create new goal
+      const newGoal: GoalItem = {
+        id: `goal-${Date.now()}`,
+        title: goalTitle.trim(),
+        progress: clampedProgress,
+        color: goalColor,
+      }
+      setGoals((prev) => [...prev, newGoal])
+      onNotify(`Goal "${goalTitle.trim()}" created!`)
+    }
+
+    setEditingGoal(null)
+    setIsAddingGoal(false)
+  }
+
+  const handleDeleteGoal = (id: string) => {
+    const goalToDelete = goals.find((g) => g.id === id)
+    setGoals((prev) => prev.filter((g) => g.id !== id))
+    onNotify(`Deleted goal "${goalToDelete?.title || 'goal'}"`)
+    setEditingGoal(null)
+    setIsAddingGoal(false)
+  }
+
   if (!type) return null
 
   const renderContent = () => {
     switch (type) {
-      case 'goals':
+      case 'goals': {
+        if (isAddingGoal || editingGoal) {
+          return (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg neo-border bg-[#F9A8D4] flex items-center justify-center">
+                    <Target className="w-4 h-4 text-black stroke-[2.5]" />
+                  </div>
+                  <h3 className="text-base font-black text-black">
+                    {isAddingGoal ? 'Add New Goal' : 'Edit Goal'}
+                  </h3>
+                </div>
+                {editingGoal && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteGoal(editingGoal.id)}
+                    className="p-1.5 rounded-lg text-black hover:bg-black/10 cursor-pointer"
+                    title="Delete Goal"
+                  >
+                    <Trash2 className="w-4 h-4 stroke-[2.4] text-[#E11D48]" />
+                  </button>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                {/* Title Input */}
+                <div>
+                  <label className="text-[11px] font-black uppercase tracking-wider text-black/70 block mb-1">
+                    Goal Description
+                  </label>
+                  <input
+                    type="text"
+                    value={goalTitle}
+                    onChange={(e) => setGoalTitle(e.target.value)}
+                    placeholder="e.g. Run 15km Every Week"
+                    className="w-full px-3 py-2 bg-white neo-border rounded-xl font-bold text-xs text-black focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+
+                {/* Progress Control */}
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-[11px] font-black uppercase tracking-wider text-black/70">
+                      Progress
+                    </label>
+                    <span className="text-xs font-black text-black">{goalProgress}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value={goalProgress}
+                    onChange={(e) => setGoalProgress(Number(e.target.value))}
+                    className="w-full accent-black cursor-pointer"
+                  />
+                  <div className="flex justify-between gap-1 mt-1.5">
+                    {[0, 25, 50, 75, 100].map((val) => (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => setGoalProgress(val)}
+                        className={`py-1 px-2 rounded-lg neo-border font-black text-[10px] cursor-pointer ${
+                          goalProgress === val ? 'bg-[#FDE047]' : 'bg-white hover:bg-black/5'
+                        }`}
+                      >
+                        {val}%
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Color Selector */}
+                <div>
+                  <label className="text-[11px] font-black uppercase tracking-wider text-black/70 block mb-1.5">
+                    Theme Color
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {GOAL_COLORS.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => setGoalColor(color)}
+                        style={{ backgroundColor: color }}
+                        className={`w-7 h-7 rounded-lg neo-border cursor-pointer flex items-center justify-center transition-transform ${
+                          goalColor === color ? 'scale-110 ring-2 ring-black' : 'hover:scale-105'
+                        }`}
+                      >
+                        {goalColor === color && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAddingGoal(false)
+                      setEditingGoal(null)
+                    }}
+                    className="flex-1 py-2.5 bg-white neo-border rounded-xl text-xs font-black text-black hover:bg-black/5 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveGoal}
+                    className="flex-1 py-2.5 bg-[#D4F972] neo-border neo-shadow rounded-xl text-xs font-black text-black flex items-center justify-center gap-1.5 cursor-pointer neo-pressable"
+                  >
+                    <Check className="w-4 h-4 stroke-[3]" />
+                    <span>Save Goal</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
         return (
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg neo-border bg-[#F9A8D4] flex items-center justify-center">
-                <Target className="w-4 h-4 text-black stroke-[2.5]" />
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg neo-border bg-[#F9A8D4] flex items-center justify-center">
+                  <Target className="w-4 h-4 text-black stroke-[2.5]" />
+                </div>
+                <h3 className="text-base font-black text-black">Active Goals</h3>
               </div>
-              <h3 className="text-base font-black text-black">Active Goals</h3>
+              <button
+                type="button"
+                onClick={handleOpenAddGoal}
+                className="px-2.5 py-1.5 bg-[#FDE047] neo-border neo-shadow-xs rounded-xl text-xs font-black text-black flex items-center gap-1 hover:bg-[#FDE047]/80 cursor-pointer neo-pressable"
+              >
+                <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                <span>Add Goal</span>
+              </button>
             </div>
-            <div className="space-y-2.5">
-              <div className="bg-white neo-border rounded-xl p-3">
-                <div className="flex justify-between items-center text-xs font-black text-black mb-1">
-                  <span>Run 15km Every Week</span>
-                  <span className="text-[#16A34A]">80%</span>
-                </div>
-                <div className="w-full h-2 bg-[#F4F0E6] neo-border rounded-full overflow-hidden p-[1px]">
-                  <div className="h-full bg-[#D4F972] rounded-full w-4/5" />
-                </div>
-              </div>
 
-              <div className="bg-white neo-border rounded-xl p-3">
-                <div className="flex justify-between items-center text-xs font-black text-black mb-1">
-                  <span>Read 20 Books in 2026</span>
-                  <span className="text-[#2563EB]">65%</span>
-                </div>
-                <div className="w-full h-2 bg-[#F4F0E6] neo-border rounded-full overflow-hidden p-[1px]">
-                  <div className="h-full bg-[#7DD3FC] rounded-full w-[65%]" />
-                </div>
+            {goals.length === 0 ? (
+              <div className="bg-white neo-border rounded-xl p-4 text-center my-2">
+                <p className="text-xs font-bold text-black/60 mb-2">No goals added yet.</p>
+                <button
+                  type="button"
+                  onClick={handleOpenAddGoal}
+                  className="px-3 py-1.5 bg-[#D4F972] neo-border neo-shadow-xs rounded-xl text-xs font-black text-black"
+                >
+                  Create Your First Goal
+                </button>
               </div>
-
-              <div className="bg-white neo-border rounded-xl p-3">
-                <div className="flex justify-between items-center text-xs font-black text-black mb-1">
-                  <span>Save ₹50,000 Emergency Fund</span>
-                  <span className="text-[#D97706]">90%</span>
-                </div>
-                <div className="w-full h-2 bg-[#F4F0E6] neo-border rounded-full overflow-hidden p-[1px]">
-                  <div className="h-full bg-[#FDE047] rounded-full w-[90%]" />
-                </div>
+            ) : (
+              <div className="space-y-2.5 max-h-[260px] overflow-y-auto no-scrollbar pr-0.5">
+                {goals.map((goal) => (
+                  <div key={goal.id} className="bg-white neo-border rounded-xl p-3 relative group">
+                    <div className="flex justify-between items-center text-xs font-black text-black mb-1.5">
+                      <span className="truncate pr-2">{goal.title}</span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="font-black text-black">{goal.progress}%</span>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditGoal(goal)}
+                          className="p-1 rounded-md hover:bg-black/10 text-black/60 hover:text-black cursor-pointer"
+                          title="Edit Goal"
+                        >
+                          <Pencil className="w-3 h-3 stroke-[2.5]" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteGoal(goal.id)}
+                          className="p-1 rounded-md hover:bg-black/10 text-black/60 hover:text-[#E11D48] cursor-pointer"
+                          title="Delete Goal"
+                        >
+                          <Trash2 className="w-3 h-3 stroke-[2.5]" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="w-full h-2 bg-[#F4F0E6] neo-border rounded-full overflow-hidden p-[1px]">
+                      <div
+                        className="h-full rounded-full transition-all duration-300"
+                        style={{
+                          width: `${Math.min(100, Math.max(0, goal.progress))}%`,
+                          backgroundColor: goal.color,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
+            )}
           </div>
         )
+      }
 
-      case 'stats':
+      case 'stats': {
+        const budgetSpentPercent =
+          monthlyBudget > 0
+            ? Math.min(100, Math.round((totalExpenses / monthlyBudget) * 100))
+            : 0
+        const budgetRemainingPercent = Math.max(0, 100 - budgetSpentPercent)
+
         return (
           <div>
             <div className="flex items-center gap-2 mb-3">
@@ -97,23 +372,37 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             <div className="space-y-2">
               <div className="bg-[#FEF08A] neo-border rounded-xl p-2.5 flex items-center justify-between">
                 <span className="text-xs font-bold text-black">Consecutive Streak</span>
-                <span className="text-sm font-black text-black">28 Days 🔥</span>
+                <span className="text-sm font-black text-black">
+                  {currentStreakDays} {currentStreakDays === 1 ? 'Day' : 'Days'} 🔥
+                </span>
               </div>
               <div className="bg-[#D4F972] neo-border rounded-xl p-2.5 flex items-center justify-between">
                 <span className="text-xs font-bold text-black">Habit Consistency</span>
-                <span className="text-sm font-black text-black">86% All-time</span>
+                <span className="text-sm font-black text-black">
+                  {completionPercentage}% This Week
+                </span>
               </div>
               <div className="bg-[#DDD6FE] neo-border rounded-xl p-2.5 flex items-center justify-between">
                 <span className="text-xs font-bold text-black">Total Workouts Logged</span>
-                <span className="text-sm font-black text-black">42 Sessions</span>
+                <span className="text-sm font-black text-black">
+                  {totalWorkouts} {totalWorkouts === 1 ? 'Session' : 'Sessions'}
+                </span>
               </div>
               <div className="bg-[#7DD3FC] neo-border rounded-xl p-2.5 flex items-center justify-between">
-                <span className="text-xs font-bold text-black">Budget Efficiency</span>
-                <span className="text-sm font-black text-black">61% Spent / 39% Saved</span>
+                <div>
+                  <span className="text-xs font-bold text-black block">Budget Efficiency</span>
+                  <span className="text-[10px] font-semibold text-black/60">
+                    ₹{totalExpenses.toLocaleString()} / ₹{monthlyBudget.toLocaleString()}
+                  </span>
+                </div>
+                <span className="text-sm font-black text-black">
+                  {budgetSpentPercent}% Spent / {budgetRemainingPercent}% Saved
+                </span>
               </div>
             </div>
           </div>
         )
+      }
 
       case 'data':
         return (
@@ -228,7 +517,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   How is budget calculated?
                 </span>
                 <p className="text-black/70">
-                  Savings = Income - Expenses. Remaining Budget = ₹40,000 - Expenses.
+                  Savings = Income - Expenses. Remaining Budget = Monthly Budget - Expenses.
                 </p>
               </div>
               <div className="bg-[#FFFDF5] neo-border rounded-xl p-2 text-center font-bold text-black/80">
